@@ -1,0 +1,2 @@
+class GameOverState:
+    pass

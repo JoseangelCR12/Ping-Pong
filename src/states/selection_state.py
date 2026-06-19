@@ -1,0 +1,2 @@
+class SelectionState:
+    pass

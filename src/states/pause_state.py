@@ -1,0 +1,2 @@
+class PauseState:
+    pass

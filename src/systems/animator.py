@@ -1,0 +1,2 @@
+class Animator:
+    pass
