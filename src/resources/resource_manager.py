@@ -1,5 +1,5 @@
 import pygame as py
-import os
+from ..utils.paths import get_asset_path
 from .assets_def import ASSETS_DICT
 
 class ResourceManager:
@@ -28,17 +28,15 @@ class ResourceManager:
         if not relative_path:
             global_data = getattr(self.ASSETS_DICT, "GLOBAL", {})
             relative_path = global_data.get("sprites",{}).get(texture_key)
-        
-        # Si no existe en ningun lado
-        if not relative_path:
-            print(f"NO EXITE LA TEXTURA '{texture_key}' en '{state_name}' ni en 'GLOBAL'")
-        
-        if os.path.exists(relative_path):
-            surface = py.image.load(relative_path).convert_alpha()
+                
+        if relative_path:
+            clean_path = get_asset_path(relative_path)
+            surface = py.image.load(clean_path).convert_alpha()
             self._textures[cache_key] = surface
             return surface
+        # Si no existe en ningun lado
         else:
-            print(f"archivo no encontrado en ruta: {relative_path}")
+            print(f"NO EXITE LA TEXTURA '{texture_key}' en '{state_name}' ni en 'GLOBAL'")
             return None
 
     def get_sound(self, state_name, sound_key):
@@ -61,16 +59,14 @@ class ResourceManager:
                 global_data = getattr(self.ASSETS_DICT, "GLOBAL", {})
                 relative_path = global_data.get("sfx",{}).get(sound_key)
             
-            # Si no existe en ningun lado
-            if not relative_path:
-                print(f"NO EXITE EL SFX '{sound_key}' en '{state_name}' ni en 'GLOBAL'")
-            
-            if os.path.exists(relative_path):
-                sfx = py.mixer.Sound(relative_path)
+            if relative_path:
+                clean_path = get_asset_path(relative_path)
+                sfx = py.mixer.Sound(clean_path)
                 self._sounds[cache_key] = sfx
                 return sfx
+            # Si no existe en ningun lado
             else:
-                print(f"archivo no encontrado en ruta: {relative_path}")
+                print(f"NO EXITE EL SFX '{sound_key}' en '{state_name}' ni en 'GLOBAL'")
                 return None
 
     def get_music_path(self, state_name, music_key):
@@ -87,15 +83,12 @@ class ResourceManager:
             global_data = getattr(self.ASSETS_DICT, "GLOBAL", {})
             relative_path = global_data.get("music",{}).get(music_key)
             
-        # Si no existe en ningun lado
-        if not relative_path:
-            print(f"NO EXITE LA MUSICA '{music_key}' en '{state_name}' ni en 'GLOBAL'")
-            
-        if os.path.exists(relative_path):
+        if relative_path:
             return relative_path 
                 
+        #Si no se encuentra en ningun lado
         else:
-            print(f"archivo no encontrado en ruta: {relative_path}")
+            print(f"NO EXISTE LA MUSICA '{music_key}' en '{state_name}' ni en 'GLOBAL'")
             return None
 
 
