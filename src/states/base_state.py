@@ -1,8 +1,11 @@
 import pygame as py
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..resources.resource_manager import ResourceManager
 
 class BaseState:
 
-    def __init__(self, resource_manager) -> None:
+    def __init__(self, resource_manager: "ResourceManager") -> None:
         self.resource_manager = resource_manager
         self.next_state = None
 

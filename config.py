@@ -16,7 +16,7 @@ BG_COLOR = (180, 180, 255)
 HORIZON_LINE_Y = 20
 FOCAL_LENGTH = WINDOW_WIDTH // 2 #mitad del ancho para un FOV de 90 grados
 
-#Table measurements
+#medidas de la mesa
 HALF_TABLE_LENGTH = 65
 NET_Y = 100
 
@@ -27,7 +27,7 @@ MAX_X = 280
 OPPONENT_SIDE_Y = NET_Y - HALF_TABLE_LENGTH
 PLAYER_SIDE_Y = NET_Y + HALF_TABLE_LENGTH
 
-#Physic constants
+#constantes fisicas
 GRAVITY = 280
 PADDLE_SPEED_Z = 150
 MAX_Z = 120

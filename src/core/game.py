@@ -38,7 +38,7 @@ class Game:
         self.Ball = Ball
 
         #Creamos el manager de recursos
-        self.resource_manager = ResourceManager(self.audio, self.renderer, self.cache)
+        self.resource_manager = ResourceManager(self.cache)
 
         self.state_manager = StateManager()
 
@@ -83,20 +83,19 @@ class Game:
             # Delegar eventos, actualización y renderizado al estado activo.
             active_state = self.state_manager.current_state
             
-            
-            active_state.handle_input(events)
-            
-            active_state.update(dt)
-            
-            self._check_transitions(active_state)
+            if active_state:
+                active_state.handle_input(events)
 
-            self.screen.fill(config.BG_COLOR)
+                active_state.update(dt)
+            
+                self._check_transitions(active_state)
 
-            active_state.render(self.screen)
+                self.screen.fill(config.BG_COLOR)
+
+                active_state.render(self.screen)
 
             # Actualizar el display.
             py.display.flip()
             
-
         py.quit()
         sys.exit()

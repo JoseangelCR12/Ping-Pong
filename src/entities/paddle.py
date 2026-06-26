@@ -29,7 +29,7 @@ class Paddle:
 
     def update_pos(self, target_x, target_y, z_delta):
         #Limites en X e Y
-        self.x = max(config.MIN_X, min(target_x, config.MAX_X))
+        self.x = max(config.MIN_X + self.width, min(target_x, config.MAX_X))
         self.y = max(config.NET_Y, min(target_y, config.PLAYER_SIDE_Y))
         #Limite de altura
         self.z = max(0, min(self.z + z_delta, config.MAX_Z))

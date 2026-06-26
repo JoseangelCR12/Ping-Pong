@@ -12,7 +12,7 @@ class Pseudo3D:
             world_y = 1
 
         #Calculamos la escala de tamaño basada en la profundidad (Y)
-        scale = config.FOCAL_LENGTH / world_y
+        scale = world_y / config.FOCAL_LENGTH 
 
         #el objeto se debe desviar lateralmente hacia el punto de fuga a medida que se aleja de nosotros
         distance_x = world_x - self.vanishing_x

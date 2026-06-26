@@ -5,7 +5,7 @@ class Button:
 
         self.image_normal = image_normal
         self.image_hover = image_hover
-        self.image_pressed =image_pressed
+        self.image_pressed = image_pressed
 
         self.image = self.image_normal
         

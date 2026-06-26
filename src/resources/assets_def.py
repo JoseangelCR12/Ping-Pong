@@ -15,7 +15,7 @@ class AssetsDef:
                 "btn_credits_h": "assets/ui/btn_credits_h.png",
                 "btn_credits_p": "assets/ui/btn_credits_p.png"
             },
-            "sfx": {},
+            "sound": {},
             "music": {}
 
         }
@@ -23,13 +23,13 @@ class AssetsDef:
             
                 
         self.PLAY = {
-            #--SPRITESHEETS-- 
-            "raqueta": ("assets/entities/raqueta.png", (24, 24), 10),
-            "pelota": ("assets/entities/pelota.png", (8, 8), 0)
+            "spritesheets": {
+            "paddle": "assets/entities/paddle.png",
+            "ball": "assets/entities/ball.png"
+            }, 
+            "sound": {},
+            "music": {}
         }
-        # si se quiere dar una vuelta al sprite usa un int, si solo quieres ciertos angulos, una tupla con esos angulos
-        # mapa cargado: clave -> dict {ruta, tam, ang_aumento/angulos a pedir}
-        # si se usa int 0 se recorta el spritesheet y se utiliza como animaciones
 
 ASSETS_DICT = AssetsDef()
 

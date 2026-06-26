@@ -7,7 +7,7 @@ from .game_over_state import GameOverState
 from .win_state import WinState
 from .credits_state import CreditsState
 
-# Definir el __all__ para controlar qué se exporta al importar el módulo states con *.
+# Definir el __all__ para controlar qué se exporta al importar el paquete states con *.
 __all__ = [
     "BaseState",
     "MenuState",

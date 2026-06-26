@@ -1,10 +1,17 @@
 import pygame as py
 from .base_state import BaseState
 import config
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..systems.renderer import Renderer
+    from ..systems.physics import Physics
+    from ..systems.pseudo_3D import Pseudo3D
+    from ..entities import *
 
 class PlayState(BaseState):
-    def __init__(self, resource_manager, physics, pseudo_3D, Paddle, Ball):
+    def __init__(self, resource_manager, renderer: "Renderer", physics: "Physics", pseudo_3D: "Pseudo3D", Paddle: type["Paddle"], Ball: type["Ball"]):
         super().__init__(resource_manager)
+        self.renderer = renderer
         self.physics = physics
         self.pseudo_3D = pseudo_3D
         self.player_paddle = Paddle(config.TABLE_MIDDLE_X, config.PLAYER_SIDE_Y)
@@ -69,3 +76,5 @@ class PlayState(BaseState):
             self.player_paddle.x, self.player_paddle.y, self.player_paddle.z,
             self.player_paddle.width, self.player_paddle.height
         )
+        layers = self.resource_manager.get_sprite_stack("PLAY", "paddle", 0)
+        self.renderer.render_sprite_stack(layers ,paddle_sx, paddle_sy, paddle_scale)
