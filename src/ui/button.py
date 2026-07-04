@@ -59,7 +59,7 @@ class Button:
         self.is_hovered = self.rect.collidepoint(mouse_pos)
 
         if self.is_hovered:
-            self.image = self.image_pressed
+            self.image = self.image_hover
         else:
             self.image = self.image_normal
         

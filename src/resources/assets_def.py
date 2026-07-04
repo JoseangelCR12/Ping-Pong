@@ -23,9 +23,12 @@ class AssetsDef:
             
                 
         self.PLAY = {
+            "sprites": {
+                "table": "assets/entities/table.png",
+            },
             "spritesheets": {
-            "paddle": "assets/entities/paddle.png",
-            "ball": "assets/entities/ball.png"
+                "paddle": "assets/entities/paddle.png",
+                "ball": "assets/entities/ball.png"
             }, 
             "sound": {},
             "music": {}

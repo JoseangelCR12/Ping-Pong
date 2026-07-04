@@ -17,10 +17,16 @@ class Paddle:
         self.vy = 0
         self.vz = 0
 
-        #las dimensiones de las raquetas en px, basadas en el sprite, para las hitboxes
-        self.width = 30
-        self.height = 37
-        self.depth = 5
+        #las dimensiones de las raquetas
+        self.width = config.PADDLE_WIDTH
+        self.thickness = config.PADDLE_THICKNESS 
+        self.height = config.PADDLE_HEIGHT
+    
+    def get_limits(self):
+        """Retorna los limites de la raqueta en el frame actual (min_x, max_x, min_y, max_y, min_z, max_z), además de el angulo de rotacion de la raqueta"""
+        return (self.x - self.width // 2, self.x + self.width // 2,
+                self.y - self.thickness // 2, self.y + self.thickness // 2,
+                self.z, self.z + self.height, self.angle)
 
     def calculate_vel(self, dt):
         #calcula la velocidad de la raqueta en cada frame
@@ -28,9 +34,8 @@ class Paddle:
             self.vx = (self.x - self.last_x)/ dt
 
     def update_pos(self, target_x, target_y, z_delta):
-        #Limites en X e Y
-        self.x = max(config.MIN_X + self.width, min(target_x, config.MAX_X))
-        self.y = max(config.NET_Y, min(target_y, config.PLAYER_SIDE_Y))
+        self.x = target_x
+        self.y = target_y
         #Limite de altura
         self.z = max(0, min(self.z + z_delta, config.MAX_Z))
     

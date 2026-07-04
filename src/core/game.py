@@ -10,8 +10,7 @@ from ..systems import *
 
 from ..states import *
 
-from ..entities.paddle import Paddle
-from ..entities.ball import Ball
+from ..entities import *
 
 from .routes import STATE_ROUTES
 
@@ -36,6 +35,7 @@ class Game:
         # Guardamos una referencia a las clase de las entidades para que el check_transitions funcione
         self.Paddle = Paddle
         self.Ball = Ball
+        self.Table = Table
 
         #Creamos el manager de recursos
         self.resource_manager = ResourceManager(self.cache)
