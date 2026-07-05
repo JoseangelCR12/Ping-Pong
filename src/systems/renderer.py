@@ -12,7 +12,7 @@ class Renderer:
     def render_sprite_stack(self, rotated_layers: list[py.Surface], screen_x: float, screen_y: float, scale: float) -> None:
         """
         Dibuja las capas ya rotadas desde la caché aplicando el desfase vertical para el efecto pseudo 3d, asi como el escalado para sensacion de profundidad
-        Dibuja en pantalla el sprite apilado centrado en x y con la base del sprite apilado en y
+        Dibuja en pantalla el sprite apilado centrado en x e y
         """
         layer_w = rotated_layers[0].get_width()
         layer_h = rotated_layers[0].get_height()
@@ -33,10 +33,18 @@ class Renderer:
         new_h = int(stack_surface.get_height() * scale)
         scaled_stack = py.transform.scale(stack_surface, (new_w, new_h)) 
             
-        #Blint en la pantalla centrando el resultado en x y colocando la base del sprite en y
+        #Blint en la pantalla centrando el resultado en x e y
         final_x = int(screen_x) - (new_w // 2)
-        final_y = int(screen_y) - (new_h)
+        final_y = int(screen_y) - (new_h // 2)
         self.screen.blit(scaled_stack, (final_x, final_y))
+
+    def render_ellipse(self, rect: tuple[int, int, int, int], alpha: int, angle: int) -> None:
+        """Dibuja una elipse en la pantalla dada una tupla de coordenadas (x, y, width, height), y una opacidad"""
+        temp_surface = py.Surface((rect[2], rect[3]), py.SRCALPHA)
+        color_alpha = (0, 0, 0, alpha)  # Color negro con opacidad variable
+        py.draw.ellipse(temp_surface, color_alpha, (0, 0, rect[2], rect[3]))
+        temp_surface = py.transform.rotate(temp_surface, angle)
+        self.screen.blit(temp_surface, (rect[0], rect[1]))
 
     def render_px (self, rect: tuple[int, int, int, int, int, int]):
         """Dibuja un pixel en la pantalla, para debug"""

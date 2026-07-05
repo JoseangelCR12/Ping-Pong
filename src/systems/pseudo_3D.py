@@ -24,6 +24,17 @@ class Pseudo3D:
 
         return int(screen_x), int(screen_y), scale
         
+    def get_shadow_properties(self, world_z, base_scale, sprite_width, sprite_depth):
+        """Calcula el tamaño y la opacidad de la sombra en función de la altura del objeto (world_z) y la escala base"""
+        height_factor = max(0.5, 1 - (world_z / 300))
+        shadow_scale = base_scale * height_factor
+        BASE_OPACITY = 210
+        shadow_opacity = int(BASE_OPACITY * height_factor)
+        shadow_width = int(sprite_width * shadow_scale)
+        shadow_depth = int(sprite_depth * shadow_scale)
+
+        return shadow_width, shadow_depth, shadow_opacity
+
     def mouse_to_world(self, mouse_x, mouse_y):
         """
         Traduce las coordenadas 2D del mouse a coordenadas 3D para la raqueta del jugador (world_x, world_y)

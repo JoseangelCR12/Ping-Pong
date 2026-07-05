@@ -39,7 +39,7 @@ ASSETS_DICT = AssetsDef()
 UI_CONFIG = { 
     "MENU": [
         {
-            "name": "play", "position": "bottom_center", "offset_x": 0, "offset_y": -40,
+            "name": "play", "position": "bottom_center", "offset_x": 0, "offset_y": -80,
             "textures": ["btn_play", "btn_play_h", "btn_play_p"]
         },
         { 
