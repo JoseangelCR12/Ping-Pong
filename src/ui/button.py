@@ -1,11 +1,10 @@
 import pygame as py
 
 class Button:
-    def __init__(self, position_type, offset_x, offset_y,image_normal, image_hover, image_pressed):
+    def __init__(self, position_type, offset_x, offset_y,image_normal, image_hover):
 
         self.image_normal = image_normal
         self.image_hover = image_hover
-        self.image_pressed = image_pressed
 
         self.image = self.image_normal
         
@@ -47,7 +46,6 @@ class Button:
 
         if event.type == py.MOUSEBUTTONDOWN and event.button == py.BUTTON_LEFT:
             if self.rect.collidepoint(event.pos):
-                self.image = self.image_pressed
                 return True
         return False
 

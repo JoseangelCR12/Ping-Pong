@@ -36,6 +36,20 @@ class Paddle:
         if dt > 0:
             self.vx = (self.x - self.last_x)/ dt
 
+    def mouse_to_world(self, mouse_sx: int, mouse_sy: int, z_delta: int):
+        """
+        Traduce las coordenadas 2D del mouse a coordenadas 3D para la raqueta (world_x, world_y)
+        Actua como clampeo de la raqueta a la mesa
+        """
+        #Calculo de la profundidad (world_y)
+        world_y = config.NET_Y - (mouse_sy * config.NET_Y // config.WINDOW_HEIGHT)
+
+        #Calculo de world_x
+        x_proportion = config.HALF_TABLE_WIDTH / (config.WINDOW_WIDTH // 2)  # Proporción de la mitad del ancho de la mesa respecto a la mitad de la pantalla
+        world_x = int(mouse_sx - config.WINDOW_WIDTH // 2) * x_proportion
+    
+        self.update_pos(world_x, world_y, z_delta)
+
     def update_pos(self, target_x, target_y, z_delta):
         """Actualiza la posicion de la raqueta en el espacio 3D, limitando la altura y calculando el angulo de rotacion en X"""
         self._angle_x(target_x)

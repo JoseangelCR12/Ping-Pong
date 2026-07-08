@@ -1,4 +1,5 @@
 import pygame as py
+import math
 from ..utils.paths import get_asset_path
 from .assets_def import ASSETS_DICT
 from typing import TYPE_CHECKING, Any
@@ -68,21 +69,43 @@ class ResourceManager:
         self.cache.save(rotated_cache_key, rotated_layers)
         return rotated_layers       
 
+    def get_scaled_strip(self, texture_surface: py.Surface, texture_key: str, line, line_width, line_height = 1):
+        """
+        Devuelve un subsurface horizontal (una tira) a partir de un surface
+        """
+        # Creamos una clave para el cache combinando el nombre del la textura de la que se genera la tira y el indice de la tira
+        cache_key = f"{texture_key}_{line}_strip"
+        cached_strip = self.cache.get(cache_key)
+        if cached_strip is not None and isinstance(cached_strip, py.Surface):
+            return cached_strip
+        
+        sprite_width = texture_surface.get_width()
+
+        rect_subsurface = py.Rect(0, line, sprite_width, line_height)
+        subsurface = texture_surface.subsurface(rect_subsurface)
+
+        new_width = math.ceil(line_width)
+        new_height = math.ceil(line_height * line_width / sprite_width)
+        
+        scaled_subsurface = py.transform.scale(subsurface, (new_width, new_height))
+
+        self.cache.save(cache_key, scaled_subsurface)
+
+        return scaled_subsurface
+
     def get_sound(self, state_name: str, sound_key: str) -> py.mixer.Sound:
-            """
-            Devuelve un sound busca en los atributos del singleton ASSETS_DICT
-            """
-            # Creamos una clave para el cache combinando el nombre del estado y el del sonido
-            cache_key = f"{state_name}_{sound_key}_sound"
-            cached_sound = self.cache.get(cache_key)
-
-            if cached_sound is not None and isinstance(cached_sound, py.mixer.Sound):
-                return cached_sound
-            
-            sound = self._load_asset(state_name, "sound", sound_key, py.mixer.Sound)
-
-            self.cache.save(cache_key, sound)
-            return sound
+        """
+        Devuelve un sound busca en los atributos del singleton ASSETS_DICT
+        """
+        # Creamos una clave para el cache combinando el nombre del estado y el del sonido
+        cache_key = f"{state_name}_{sound_key}_sound"
+        cached_sound = self.cache.get(cache_key)
+        if cached_sound is not None and isinstance(cached_sound, py.mixer.Sound):
+            return cached_sound
+        
+        sound = self._load_asset(state_name, "sound", sound_key, py.mixer.Sound)
+        self.cache.save(cache_key, sound)
+        return sound
 
     def get_music_path(self, state_name, music_key):
         """

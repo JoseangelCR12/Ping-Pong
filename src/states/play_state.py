@@ -5,18 +5,24 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..systems.renderer import Renderer
     from ..systems.physics import Physics
-    from ..systems.pseudo_3D import Pseudo3D
+    from ..systems.world_renderer import WorldRenderer
     from ..entities import *
 
 class PlayState(BaseState):
-    def __init__(self, resource_manager, renderer: "Renderer", physics: "Physics", pseudo_3D: "Pseudo3D", Paddle: type["Paddle"], Ball: type["Ball"], Table: type["Table"]):
+    def __init__(self, resource_manager, renderer: "Renderer", physics: "Physics", world_renderer: "WorldRenderer", Paddle: type["Paddle"], Ball: type["Ball"], Table: type["Table"]):
         super().__init__(resource_manager)
         self.renderer = renderer
         self.physics = physics
-        self.pseudo_3D = pseudo_3D
+        self.world_renderer = world_renderer
         self.player_paddle = Paddle(0, config.PLAYER_SIDE_Y)
         self.ball = Ball(0, config.PLAYER_SIDE_Y - 20)
-        self.table = Table(0, config.NET_Y, 0)
+        self.table = Table(0, config.NET_Y, config.Z_TABLE)
+
+        self.state_name = "PLAY"
+
+        #cargamos texturas estaticas
+        self.floor_texture = self.resource_manager.get_texture(self.state_name, "floor")
+        self.table_texture = self.resource_manager.get_texture(self.state_name, "table")
 
         ##
         self.test_paddle = Paddle(0, config.NET_Y)
@@ -68,60 +74,42 @@ class PlayState(BaseState):
     def update(self, dt: float) -> None:
         if self.is_paused:
             return
-        #Traducimos la posicion del mouse a el espacio 3D
-        target_x, target_y = self.pseudo_3D.mouse_to_world(self.mouse_sx, self.mouse_sy)
-        #pasamos las coordenadas traducidas a la raqueta del jugador
-        self.player_paddle.update_pos(target_x, target_y, self.target_z_change)
+        #Enviamos la informacion del mouse a la raqueta, la cual aplica el clamp y guarda la posicion tridimensional al traducir coordenadas del mouse
+        self.player_paddle.mouse_to_world(self.mouse_sx, self.mouse_sy, self.target_z_change)
 
         ###
-        self.test_paddle.update_pos(target_x, target_y + 224, self.target_z_change)
+        self.test_paddle.mouse_to_world(self.mouse_sx, self.mouse_sy - config.WINDOW_HEIGHT, self.target_z_change)
         ###
-
-        
-    
+            
     def render(self, screen: py.Surface) -> None:
-        ##SUPER PROVISIONAL
-        table_infleft_sx, table_max_sy, _ = self.pseudo_3D.world_to_screen(
-            self.table.x - self.table.half_width, self.table.y - self.table.half_length, self.table.z)
-        table_supleft_sx, _, _ = self.pseudo_3D.world_to_screen(
-            self.table.x - self.table.half_width, self.table.y + self.table.half_length, self.table.z)
-        table_supright_sx, table_min_sy, _ = self.pseudo_3D.world_to_screen(
-            self.table.x + self.table.half_width, self.table.y + self.table.half_length, self.table.z)
-        table_infright_sx, _, _ = self.pseudo_3D.world_to_screen(
-            self.table.x + self.table.half_width, self.table.y - self.table.half_length, self.table.z)
-        self.renderer.render_by_scanlines((table_infleft_sx, table_supleft_sx, table_min_sy, table_max_sy, config.WINDOW_WIDTH // 2), self.resource_manager.get_texture("PLAY", "table"))
-        self.renderer.render_px((table_infleft_sx, table_supright_sx, table_supleft_sx, table_infright_sx, table_max_sy, table_min_sy))
-        ##PPPP
+        
+        
+        self.world_renderer.render_xy_polygon(
+            self.table.x, self.table.y, config.Z_FLOOR, config.WINDOW_WIDTH * 2,
+            config.WINDOW_HEIGHT * 3, self.floor_texture, self.state_name, "floor"
+            )
 
-        ########
-        testp_sx, testp_sy, testp_scale = self.pseudo_3D.world_to_screen(
-            self.test_paddle.x, self.test_paddle.y, self.test_paddle.z
+
+        self.world_renderer.render_xy_polygon( 
+            self.table.x, self.table.y, self.table.z, self.table.half_width, 
+            self.table.half_length, self.table_texture, self.state_name, "table"
             )
         
-        shadow_sx, shadow_sy, _ = self.pseudo_3D.world_to_screen(
-            self.test_paddle.x, self.test_paddle.y, self.table.z
+        ######
+        self.world_renderer.render_xz_entity(
+            self.test_paddle.x, self.test_paddle.y, self.test_paddle.z,
+            self.table.z, self.test_paddle.width, self.test_paddle.thickness,
+            "PLAY", "paddle", -self.test_paddle.angle
             )
-
-        shadow_width, shadow_depth, shadow_opacity = self.pseudo_3D.get_shadow_properties(self.test_paddle.z, testp_scale, self.test_paddle.width, self.test_paddle.thickness)
-        self.renderer.render_ellipse((shadow_sx - shadow_width // 2, shadow_sy - shadow_depth // 2, shadow_width, shadow_depth), shadow_opacity, -self.test_paddle.angle)
-
-        ########
-        layers = self.resource_manager.get_sprite_stack("PLAY", "paddle", -self.test_paddle.angle)
-        self.renderer.render_sprite_stack(layers, testp_sx, testp_sy, testp_scale)
 
         ##PROVISIONAL
-        paddle_sx, paddle_sy, paddle_scale = self.pseudo_3D.world_to_screen(
-            self.player_paddle.x, self.player_paddle.y, self.player_paddle.z
+        self.world_renderer.render_xz_entity(
+            self.player_paddle.x, self.player_paddle.y, self.player_paddle.z,
+            self.table.z, self.player_paddle.width, self.player_paddle.thickness,
+            "PLAY", "paddle", self.player_paddle.angle
             )
 
-        shadow_sx, shadow_sy, _ = self.pseudo_3D.world_to_screen(
-            self.player_paddle.x, self.player_paddle.y, self.table.z
-            )
-        
-        shadow_width, shadow_depth, shadow_opacity = self.pseudo_3D.get_shadow_properties(self.player_paddle.z, paddle_scale, self.player_paddle.width, self.player_paddle.thickness)
-        self.renderer.render_ellipse((shadow_sx - shadow_width // 2, shadow_sy - shadow_depth // 2, shadow_width, shadow_depth), shadow_opacity, self.player_paddle.angle)
 
-        layers = self.resource_manager.get_sprite_stack("PLAY", "paddle", self.player_paddle.angle)
-        self.renderer.render_sprite_stack(layers ,paddle_sx, paddle_sy, paddle_scale)
+
 
 

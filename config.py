@@ -9,22 +9,22 @@ TITLE = "PingPong"
 FPS = 60
 
 # Colores
-BG_COLOR = (180, 180, 255)
+BG_COLOR = (75, 156, 211)
 
 """Ajustes del juego"""
 
 #AJUSTES PSEUDO 3D
 HORIZON_LINE_SY = 30
-CAMERA_DEPTH = -120 #Profundidad de la camara en el eje Y, desde el lado del jugador (a 30 unidades del borde de la mesa), negativo para que la camara este detras del jugador
-CAMERA_HEIGHT = 254 #Altura de la camara en el eje Z, desde el lado del jugador
-Y_MAX = 508 #Profundidad maxima en el eje Y, tamaño en Y de la mesa además de 30 unidades de cada lado de la mesa
-FOCAL_LENGTH = 381 #Distancia focal para la proyeccion pseudo 3D, mayor distancia focal significa menor escalado en la distancia
+CAMERA_DEPTH = -200 #Profundidad de la camara en el eje Y, desde el lado del jugador (a 30 unidades del borde de la mesa), negativo para que la camara este detras del jugador
+CAMERA_HEIGHT = 304 #Altura de la camara en el eje Z, desde el lado del jugador
+
+FOCAL_LENGTH = 456 #Distancia focal para la proyeccion pseudo 3D, mayor distancia focal significa menor escalado en la distancia
 K_PADDING = FOCAL_LENGTH / 2 #Constante para evitar division por cero en la proyeccion pseudo 3D y suavizar el escalado en la distancia
 
 #medidas de la mesa en el espacio 3d
 
-HALF_TABLE_LENGTH = 224 #Largo total de la mesa = 448
-HALF_TABLE_WIDTH = 152 #Ancho total de la mesa = 304
+HALF_TABLE_LENGTH = 274 #Largo total de la mesa = 548
+HALF_TABLE_WIDTH = 152 #Ancho total de la mesa = 306
 TABLE_THICKNESS = 8 #Grosor de la mesa en Z
 
 #Posiciones fijas en el eje de profundidad (Y)
@@ -32,6 +32,12 @@ TABLE_THICKNESS = 8 #Grosor de la mesa en Z
 PLAYER_SIDE_Y = 30 
 NET_Y = PLAYER_SIDE_Y + HALF_TABLE_LENGTH
 OPPONENT_SIDE_Y = NET_Y + HALF_TABLE_LENGTH
+
+Y_MAX = OPPONENT_SIDE_Y + PLAYER_SIDE_Y #Profundidad maxima en el eje Y, tamaño en Y de la mesa además de 30 unidades de cada lado de la mesa
+
+#Posiciones fijas en el eje de altura (Z)
+Z_TABLE = 0
+Z_FLOOR = -152
 
 #Medidas de la malla
 NET_THICKNESS = 8 #Grosor de la malla en Y
@@ -49,6 +55,7 @@ BALL_RADIUS = 4
 #Constantes fisicas
 GRAVITY = 280
 MIN_PADDLE_Z = PADDLE_HEIGHT // 2
-MAX_PADDLE_Z = 150
+MAX_PADDLE_Z = 152
 WHEEL_SENSITIVITY = 15
 
+        

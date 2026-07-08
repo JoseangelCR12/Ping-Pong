@@ -22,10 +22,10 @@ class BaseState:
         pass
 
     def handle_input(self, events: list[py.event.Event]) -> None:
-        raise NotImplementedError
+        pass
     
     def update(self, dt: float) -> None:
-        raise NotImplementedError
+        pass
     
     def render(self, screen: py.Surface) -> None:
         raise NotImplementedError

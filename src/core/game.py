@@ -24,7 +24,7 @@ class Game:
         self.clock = py.time.Clock()
         self.running = True
 
-        # Instanciamos sistemas y gestor de caché
+        # Instanciamos sistemas, gestor de caché y el gestor de recursos
         self.physics = Physics()
         self.animator = Animator()
         self.pseudo_3D = Pseudo3D()
@@ -32,17 +32,19 @@ class Game:
         self.renderer = Renderer(self.screen)
         self.cache = CacheManager()
 
+        self.resource_manager = ResourceManager(self.cache)
+
+        self.world_renderer = WorldRenderer(self.resource_manager, self.renderer, self.pseudo_3D)
+
         # Guardamos una referencia a las clase de las entidades para que el check_transitions funcione
         self.Paddle = Paddle
         self.Ball = Ball
         self.Table = Table
 
-        #Creamos el manager de recursos
-        self.resource_manager = ResourceManager(self.cache)
-
+        # Instanciamos el gestor de estados e iniciamos el menú
         self.state_manager = StateManager()
 
-        menu_state = MenuState(self.resource_manager)
+        menu_state = MenuState(self.resource_manager, self.renderer)
         self.state_manager.change_state(menu_state)
 
     def _check_transitions(self, active_state):
