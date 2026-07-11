@@ -3,14 +3,14 @@ from .base_state import BaseState
 import config
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from ..systems.renderer import Renderer
-    from ..systems.physics import Physics
-    from ..systems.world_renderer import WorldRenderer
+
+    from ..systems import *
     from ..entities import *
 
 class PlayState(BaseState):
-    def __init__(self, resource_manager, renderer: "Renderer", physics: "Physics", world_renderer: "WorldRenderer", Paddle: type["Paddle"], Ball: type["Ball"], Table: type["Table"]):
+    def __init__(self, resource_manager, audio: "Audio", renderer: "Renderer", physics: "Physics", world_renderer: "WorldRenderer", Paddle: type["Paddle"], Ball: type["Ball"], Table: type["Table"]):
         super().__init__(resource_manager)
+        self.audio = audio
         self.renderer = renderer
         self.physics = physics
         self.world_renderer = world_renderer
@@ -50,7 +50,7 @@ class PlayState(BaseState):
         for event in events:
             if event.type == py.KEYDOWN:
                 if event.key == py.K_ESCAPE:
-                    self.next_state = "MENU"
+                    self.next_change_state = "MENU"
                     py.mouse.set_visible(True)
                     py.event.set_grab(False)  # Libera el mouse
                 elif event.key == py.K_p:
@@ -68,47 +68,48 @@ class PlayState(BaseState):
         #Inputs continuos (como el mouse)
 
         #Posicion del mouse para la raqueta en X e Y simulados 3D
-        self.mouse_sx, self.mouse_sy = py.mouse.get_pos()
+        self.mouse_x, self.mouse_y = py.mouse.get_pos()
             
     
     def update(self, dt: float) -> None:
         if self.is_paused:
             return
         #Enviamos la informacion del mouse a la raqueta, la cual aplica el clamp y guarda la posicion tridimensional al traducir coordenadas del mouse
-        self.player_paddle.mouse_to_world(self.mouse_sx, self.mouse_sy, self.target_z_change)
+        self.player_paddle.mouse_to_world(self.mouse_x, self.mouse_y, self.target_z_change, dt)
 
         ###
-        self.test_paddle.mouse_to_world(self.mouse_sx, self.mouse_sy - config.WINDOW_HEIGHT, self.target_z_change)
+        self.test_paddle.mouse_to_world(self.mouse_x, self.mouse_y - config.WINDOW_HEIGHT, self.target_z_change, dt)
         ###
             
     def render(self, screen: py.Surface) -> None:
-        
-        
-        self.world_renderer.render_xy_polygon(
-            self.table.x, self.table.y, config.Z_FLOOR, config.WINDOW_WIDTH * 2,
-            config.WINDOW_HEIGHT * 3, self.floor_texture, self.state_name, "floor"
+
+        self.world_renderer.clear_queue()
+
+        self.world_renderer.add_xy_element(
+            self.table.x, 2 * self.table.y , config.Z_FLOOR, int(config.WINDOW_WIDTH * 2.5),
+            config.WINDOW_HEIGHT * 2, "floor", self.state_name, self.floor_texture
             )
 
-
-        self.world_renderer.render_xy_polygon( 
+        self.world_renderer.add_xy_element( 
             self.table.x, self.table.y, self.table.z, self.table.half_width, 
-            self.table.half_length, self.table_texture, self.state_name, "table"
+            self.table.half_length, self.state_name, "table", self.table_texture
             )
         
         ######
-        self.world_renderer.render_xz_entity(
+        self.world_renderer.add_xz_element(
             self.test_paddle.x, self.test_paddle.y, self.test_paddle.z,
             self.table.z, self.test_paddle.width, self.test_paddle.thickness,
-            "PLAY", "paddle", -self.test_paddle.angle
+            "PLAY", "paddle", None, -self.test_paddle.angle
             )
 
         ##PROVISIONAL
-        self.world_renderer.render_xz_entity(
+        self.world_renderer.add_xz_element(
             self.player_paddle.x, self.player_paddle.y, self.player_paddle.z,
             self.table.z, self.player_paddle.width, self.player_paddle.thickness,
-            "PLAY", "paddle", self.player_paddle.angle
+            "PLAY", "paddle", None ,self.player_paddle.angle
             )
 
+        self.world_renderer.render_world()
 
 
 

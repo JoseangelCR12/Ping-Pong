@@ -4,10 +4,16 @@ class Renderer:
     def __init__(self, screen: py.Surface) -> None:
         self.screen = screen
 
-    def render_sprite(self, texture: py.Surface, x: int, y:int) -> None:
+    def render_sprite(self, texture: py.Surface, x: int, y:int, scale = None) -> None:
         """Dibuja un sprite 2D comun directamente, centrado"""
         texture_w = texture.get_width()
         texture_h = texture.get_height()
+        
+        if scale is not None:
+            texture_w = int(texture_w * scale)
+            texture_h = int(texture_h * scale)
+            texture = py.transform.scale(texture, (texture_w, texture_h))
+            
         final_x = x - texture_w // 2
         final_y = y - texture_h // 2
         self.screen.blit(texture, (final_x, final_y))
@@ -42,13 +48,24 @@ class Renderer:
         self.screen.blit(scaled_stack, (final_x, final_y))
 
     def render_ellipse(self, rect: tuple[int, int, int, int], alpha: int, angle: int) -> None:
-        """Dibuja una elipse centrada en la pantalla dada una tupla de coordenadas (x, y, width, height), y una opacidad"""
+        """Dibuja una elipse negra centrada dada una tupla de coordenadas (x, y, width, height), y una opacidad"""
         final_x = rect[0] - rect[2] // 2
         final_y = rect[1] - rect[3] // 2
         temp_surface = py.Surface((rect[2], rect[3]), py.SRCALPHA)
         color_alpha = (0, 0, 0, alpha)  # Color negro con opacidad variable
         py.draw.ellipse(temp_surface, color_alpha, (0, 0, rect[2], rect[3]))
         temp_surface = py.transform.rotate(temp_surface, angle)
+        self.screen.blit(temp_surface, (final_x, final_y))
+
+    def render_rectangle(self, rect: tuple[int, int, int, int], alpha: int, angle: int = 0) -> None:
+        """Dibuja un rectangulo negro centrado dada una tupla de coordenadas (x, y, width, height), y una opacidad"""
+        final_x = rect[0] - rect[2] // 2
+        final_y = rect[1] - rect[3] // 2
+        temp_surface = py.Surface((rect[2], rect[3]), py.SRCALPHA)
+        color_alpha = (0, 0, 0, alpha)  # Color negro con opacidad variable
+        py.draw.rect(temp_surface, color_alpha, (0, 0, rect[2], rect[3]))
+        if angle != 0:
+            temp_surface = py.transform.rotate(temp_surface, angle)
         self.screen.blit(temp_surface, (final_x, final_y))
 
 

@@ -1,22 +1,15 @@
 import pygame as py
-
-class Button:
-    def __init__(self, position_type: str, offset_x: int, offset_y: int, image_normal: py.Surface, image_hover: py.Surface):
-
-        self.image_normal = image_normal
-        self.image_hover = image_hover
-
-        self.image = self.image_normal
+class Icon:
+    def __init__(self, position_type: str, offset_x: int, offset_y: int, image: py.Surface):
         
-        #Parámetros para la posición del botón
+        #Parámetros para la posición del icono
         self.position_type = position_type
         self.offset_x = offset_x
         self.offset_y = offset_y
-
+        self.image = image
         #El rect aún no se posiciona, no tenemos la info de screen
         self.rect = self.image.get_rect()
         self.is_positioned = False
-        self.is_hovered = False
 
     def _calculate_position(self, screen: py.Surface):
         screen_rect = screen.get_rect()
@@ -39,30 +32,9 @@ class Button:
 
         #Bandera para que solo se posicione la primera vez
         self.is_positioned = True
-
-    def handle_input(self, event: py.event.Event):
-        if not self.is_positioned:
-            return False
-
-        if event.type == py.MOUSEBUTTONDOWN and event.button == py.BUTTON_LEFT:
-            if self.rect.collidepoint(event.pos):
-                return True
-        return False
-
-    def update(self, mouse_pos):
-        """Actualiza el aspecto del botón de acuerdo a la posición del cursor."""
-        if not self.is_positioned:
-            return
-        
-        self.is_hovered = self.rect.collidepoint(mouse_pos)
-
-        if self.is_hovered:
-            self.image = self.image_hover
-        else:
-            self.image = self.image_normal
         
     def draw(self, screen: py.Surface):
-        """Dibuja el botón en su posición con la textura actual"""
+        """Dibuja el icono en su posición con la textura actual"""
         if not self.is_positioned:
             self._calculate_position(screen)
 

@@ -1,0 +1,11 @@
+{
+    "volume_sfx": 0.7,
+    "volume_music": 1.0,
+    "theme": "udo",
+    "camera_mode": "standard",
+    "horizon_line": 0,
+    "camera_depth": -200,
+    "camera_height": 304,
+    "focal_length": 456,
+    "k_padding": 228
+}

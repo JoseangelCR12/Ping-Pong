@@ -8,7 +8,7 @@ class Net():
         
         #Dimensiones
         self.half_width = config.HALF_NET_WIDTH
-        self.half_thickness = config.NET_THICKNESS // 2
+        self.half_thickness = config.HALF_NET_THICKNESS
         self.height = config.NET_HEIGHT
 
         #limites de la collision box

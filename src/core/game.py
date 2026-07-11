@@ -6,13 +6,14 @@ from .state_manager import StateManager
 from ..resources.cache_manager import CacheManager
 from ..resources.resource_manager import ResourceManager
 
+from .settings import load_from_file
+from .routes import STATE_ROUTES
+
 from ..systems import *
 
 from ..states import *
 
 from ..entities import *
-
-from .routes import STATE_ROUTES
 
 
 class Game:
@@ -24,15 +25,17 @@ class Game:
         self.clock = py.time.Clock()
         self.running = True
 
+        #Cargamos datos de guardado de ajustes
+        load_from_file()
+
         # Instanciamos sistemas, gestor de caché y el gestor de recursos
         self.physics = Physics()
-        self.animator = Animator()
         self.pseudo_3D = Pseudo3D()
-        self.audio = Audio()
         self.renderer = Renderer(self.screen)
         self.cache = CacheManager()
 
         self.resource_manager = ResourceManager(self.cache)
+        self.audio = Audio(self.resource_manager)
 
         self.world_renderer = WorldRenderer(self.resource_manager, self.renderer, self.pseudo_3D)
 
@@ -42,23 +45,20 @@ class Game:
         self.Table = Table
 
         # Instanciamos el gestor de estados e iniciamos el menú
-        self.state_manager = StateManager()
+        self.state_manager = StateManager(states_factory=self.states_factory)
 
-        menu_state = MenuState(self.resource_manager, self.renderer)
+        #iniciamos el menu
+        menu_state = MenuState(self.resource_manager, self.audio)
         self.state_manager.change_state(menu_state)
 
-    def _check_transitions(self, active_state):
-        if active_state and active_state.next_state is not None:
-            destination = active_state.next_state
-            active_state.next_state = None
-
-            if destination in STATE_ROUTES:
-                state_class, dependencies = STATE_ROUTES[destination]
-                args = [getattr(self, dep) for dep in dependencies]
-                new_state = state_class(*args)
-
-                self.state_manager.change_state(new_state)
-            else: print(f"RUTA '{destination}' NO ENCONTRADA")
+    def states_factory(self, destination: str):
+        #Fabrica de estados: construye e inyecta dependencias
+        if destination in STATE_ROUTES:
+            state_class, dependencies = STATE_ROUTES[destination]
+            args = [getattr(self, dep) for dep in dependencies]
+            return state_class(*args) 
+        print(f"RUTA '{destination}' NO ENCONTRADA")
+        return None
 
     def run(self):
         fps_timer, frames = 0 , 0
@@ -83,18 +83,11 @@ class Game:
                     self.running = False
 
             # Delegar eventos, actualización y renderizado al estado activo.
-            active_state = self.state_manager.current_state
-            
-            if active_state:
-                active_state.handle_input(events)
+            self.state_manager.handle_input(events)
 
-                active_state.update(dt)
-            
-                self._check_transitions(active_state)
+            self.state_manager.update(dt)
 
-                self.screen.fill(config.BG_COLOR)
-
-                active_state.render(self.screen)
+            self.state_manager.render(self.screen)
 
             # Actualizar el display.
             py.display.flip()

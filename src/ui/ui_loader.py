@@ -1,12 +1,21 @@
 from .button import Button
-from ..resources.assets_def import UI_CONFIG
+from .icon import Icon
+from .slider import Slider
+from . import ui_config
 
 def load_ui(state_name, resource_manager):
-    """Genera un dict con los botones de cada estado"""
-    buttons_dict = {}
+    """Genera un dict con los botones e iconos de cada estado"""
+    ui_elements = {
+        "buttons": {},
+        "icons": {},
+        "sliders": {}
+    }
+
+    state_dict = getattr(ui_config, state_name)
+
     
     #se busca la lista de botones de la pantalla
-    state_buttons_data = UI_CONFIG.get(state_name, [])
+    state_buttons_data = state_dict.get("buttons", [])
 
     for btn_data in state_buttons_data:
         img_n = resource_manager.get_texture(state_name, btn_data["textures"][0])
@@ -20,6 +29,46 @@ def load_ui(state_name, resource_manager):
             image_hover=img_h
             )
 
-        buttons_dict[btn_data["name"]] = new_button
+        ui_elements["buttons"][btn_data["name"]] = new_button
+
+    #se busca la lista de iconos de la pantalla
+    state_icons_data = state_dict.get("icons", [])
+
+    for icon_data in state_icons_data:
+        img = resource_manager.get_texture(state_name, icon_data["texture"])
+       
+        
+        new_icon = Icon(
+            position_type=icon_data["position"],
+            offset_x=icon_data["offset_x"],
+            offset_y=icon_data["offset_y"],
+            image=img
+            )
+        
+        ui_elements["icons"][icon_data["name"]] = new_icon
+        
+    #se busca la lista de botones de la pantalla
+    state_sliders_data = state_dict.get("sliders", [])
+
+    for slider_data in state_sliders_data:
+        img_bar_empty = resource_manager.get_texture(state_name, slider_data["textures"][0])
+        img_bar_full = resource_manager.get_texture(state_name, slider_data["textures"][1])
+        img_btn_n = resource_manager.get_texture(state_name, slider_data["textures"][2])
+        img_btn_h = resource_manager.get_texture(state_name, slider_data["textures"][3])
+        
+        new_slider = Slider(
+            position_type=slider_data["position"],
+            offset_x=slider_data["offset_x"],
+            offset_y=slider_data["offset_y"],
+            min_value=slider_data["min_value"],
+            max_value=slider_data["max_value"],
+            init_value=slider_data["init_value"],
+            image_empty=img_bar_empty,
+            image_full=img_bar_full,
+            image_btn=img_btn_n,
+            image_btn_h=img_btn_h
+            )
+
+        ui_elements["sliders"][slider_data["name"]] = new_slider
     
-    return buttons_dict
+    return ui_elements

@@ -1,7 +1,8 @@
 import pygame as py
 import math
+from . import assets_def
+from ..core import settings
 from ..utils.paths import get_asset_path
-from .assets_def import ASSETS_DICT
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -10,13 +11,12 @@ if TYPE_CHECKING:
 class ResourceManager:
     def __init__(self, cache: "CacheManager"):       
         self.cache = cache
-        self.ASSETS_DICT = ASSETS_DICT
         
     #METODOS PUBLICOS PRINCIPALES
     
     def get_texture(self, state_name, texture_key) -> py.Surface:
         """
-        Devuelve una superficie de pygame, busca en los atributos del singleton ASSETS_DICT
+        Devuelve una superficie de pygame
         """
         # Creamos una clave para el cache combinando el nombre del estado y el de la textura
         cache_key = f"{state_name}_{texture_key}"
@@ -95,7 +95,7 @@ class ResourceManager:
 
     def get_sound(self, state_name: str, sound_key: str) -> py.mixer.Sound:
         """
-        Devuelve un sound busca en los atributos del singleton ASSETS_DICT
+        Devuelve un sound (sfx)
         """
         # Creamos una clave para el cache combinando el nombre del estado y el del sonido
         cache_key = f"{state_name}_{sound_key}_sound"
@@ -120,14 +120,15 @@ class ResourceManager:
     def _get_path_from_dict(self, state_name: str, category: str, key: str) -> str:
         """Busca la ruta en el estado actual o en GLOBAL"""
         #category puede ser "sprites" "spritesheets" o "audio"
-        state_data = getattr(self.ASSETS_DICT, state_name, {})
+        state_data = getattr(assets_def, state_name, {})
 
         # Extraemos la ruta de la categoria dada del estado
         relative_path = state_data.get(category,{}).get(key)
+        
 
         # Si no esta se busca globalmente
         if not relative_path:
-            global_data = getattr(self.ASSETS_DICT, "GLOBAL", {})
+            global_data = getattr(assets_def, "GLOBAL", {})
             relative_path = global_data.get(category,{}).get(key)
                 
         #Si no se encuentra en ningun lado
@@ -139,7 +140,12 @@ class ResourceManager:
     def _load_asset(self, state_name: str, category: str, key: str, load_function: Any) -> Any:
         """Consigue la ruta, la limpia(para que sea independiente del OS) y ejecuta la carga de Pygame"""
         relative_path = self._get_path_from_dict(state_name, category, key)
-        clean_path = get_asset_path(relative_path)
+        
+        #Aplicamos el formato del tema
+        current_theme = settings.data["theme"]
+        formatted_path = relative_path.format(theme=current_theme)
+
+        clean_path = get_asset_path(formatted_path)
 
         #ejecuta py.image.load o py.mixer.Sound segun la funcion recibida
         return load_function(clean_path)

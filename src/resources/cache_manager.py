@@ -12,3 +12,7 @@ class CacheManager:
     def save(self, key: str, data: Any) -> None:
         """Guarda la referencia del objeto en el diccionario de cache"""
         self._cache_storage[key] = data
+
+    def clear_all(self) -> None:
+        """Borra toda la cache, util al salir de un estado"""
+        self._cache_storage.clear()

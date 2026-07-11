@@ -1,16 +1,20 @@
 import config
-from systems.physics import Physics
 
 class Ball:
-    def __init__(self, start_x, start_y, start_z=0.0, vx = 0.0, vy = 0.0, vz = 0.0):
+    def __init__(self, start_x, start_y, start_z=0):
+        self.x = start_x
+        self.y = start_y
+        self.z = start_z
 
-        #Instanciamos el componente de fisicas
-        self.physics = Physics(x = start_x, y = start_y, z = start_z, vx = vx, vy = vy, vz = vz)
+        #última posición para calcular velocidades que el modulo fisica usará
+        self.last_x = start_x
+        self.last_y = start_y
+        self.last_z = start_z
 
-        #posiciones que usara el renderizado/dibujo del juego
-        self.x = self.physics.position.x
-        self.y = self.physics.position.y
-        self.z = self.physics.position.z
+        #velocidades
+        self.vx = 0
+        self.vy = 0
+        self.vz = 0
 
         #las dimensiones de la pelota (la hitbox será un cubo)
         self.radius = config.BALL_RADIUS
@@ -23,20 +27,19 @@ class Ball:
                 self.y - self.radius, self.y + self.radius,
                 self.z - self.radius, self.z + self.radius)
 
-    def update(self, table, net, paddle):
 
-        """Metodo que corre en cada Frame del juego"""
+    def update_pos(self, target_x, target_y, target_z, dt):
+        
+        self.x = target_x
+        self.y = target_y
+        self.z = target_z
 
-        #Obtenemos los limites de la mesa, red, paddle y las velocidas del paddle en x,y,z
-        table_limits = table.get_limits()
-        net_limits = net.get_limits()
-        paddle_limits = paddle.get.limits()
-        paddle_velocities = (paddle.vx, paddle.vy, paddle.vz)
+        #Calcula su velocidad cada que se mueve
+        self._calculate_vel(dt)
 
-        #Llama al metodo movement_update del modulo physics y le pasa los limites
-        self.physics._movement_update(table_limits, net_limits)
-
-        #Sincroniza las variables visuales con los nuevos valores de las fisicas
-        self.x = self.physics.position.x
-        self.y = self.physics.position.y
-        self.z = self.physics.position.z
+    def _calculate_vel(self, dt):
+        #calcula la velocidad de la pelota 
+        if dt > 0:
+            self.vx = (self.x - self.last_x) / dt
+            self.vy = (self.y - self.last_y) / dt
+            self.vz = (self.z - self.last_z) / dt

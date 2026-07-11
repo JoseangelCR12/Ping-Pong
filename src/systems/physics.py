@@ -1,6 +1,9 @@
 import config
 
 class Physics:
+<<<<<<< HEAD
+    pass
+=======
 
     """Agarramos las Variables de posicion y velocidad del objeto e inicializamos la gravedad, aceleracion y restitucion"""
 
@@ -158,3 +161,4 @@ class Physics:
         self.position.x += self.speed.x
         self.position.y += self.speed.y
         self.position.z += self.speed.z 
+>>>>>>> 034ec7b (se añadio el modulo cpu en su fase preliminar altamente sujeta a cambios, se añadieron 2 nuevas constantes a config y se modifico un poco el modulo physics.)

@@ -5,16 +5,18 @@ from ..ui.ui_loader import load_ui
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..systems.renderer import Renderer
+    from ..systems.audio import Audio
 
 class MenuState(BaseState):
     #Estado del menú principal del juego
-    def __init__(self, resource_manager, renderer: "Renderer"):
+    def __init__(self, resource_manager, audio: "Audio"):
         super().__init__(resource_manager)
-        self.renderer = renderer
+        self.audio = audio
 
-        self.buttons = load_ui("MENU", self.resource_manager)
-        self.logo = self.resource_manager.get_texture("MENU", "logo")
+        self.ui_elements = load_ui("MENU", self.resource_manager)
+        self.buttons = self.ui_elements["buttons"]
+        self.icons = self.ui_elements["icons"]
+
 
     def enter(self, datos=None): 
         pass
@@ -25,7 +27,9 @@ class MenuState(BaseState):
     def handle_input(self, events : list[py.event.Event]) -> None:
         for event in events:
             if self.buttons["play"].handle_input(event):
-                self.next_state = "PLAY"
+                self.next_change_state = "PLAY"
+            elif self.buttons["options"].handle_input(event):
+                self.next_push_state = "OPTIONS"
             elif self.buttons["credits"].handle_input(event):
                 pass
     
@@ -36,7 +40,8 @@ class MenuState(BaseState):
             button.update(mouse_pos)
     
     def render(self, screen: py.Surface) -> None:
-        self.renderer.render_sprite(self.logo, config.WINDOW_WIDTH // 2, 80)
+        for icon in self.icons.values():
+            icon.draw(screen)
         for button in self.buttons.values():
             button.draw(screen)
         
