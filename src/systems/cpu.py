@@ -1,4 +1,4 @@
-from entities import config
+import config
 import math
 
 class CPU:

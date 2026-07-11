@@ -47,26 +47,39 @@ class Renderer:
         final_y = (screen_y) - (new_h // 2)
         self.screen.blit(scaled_stack, (final_x, final_y))
 
-    def render_ellipse(self, rect: tuple[int, int, int, int], alpha: int, angle: int) -> None:
+    def render_ellipse(self, rect: tuple[int, int, int, int], alpha: int, angle: int = 0) -> None:
         """Dibuja una elipse negra centrada dada una tupla de coordenadas (x, y, width, height), y una opacidad"""
-        final_x = rect[0] - rect[2] // 2
-        final_y = rect[1] - rect[3] // 2
+        #Dibujamos en una surface temporal
         temp_surface = py.Surface((rect[2], rect[3]), py.SRCALPHA)
         color_alpha = (0, 0, 0, alpha)  # Color negro con opacidad variable
         py.draw.ellipse(temp_surface, color_alpha, (0, 0, rect[2], rect[3]))
-        temp_surface = py.transform.rotate(temp_surface, angle)
-        self.screen.blit(temp_surface, (final_x, final_y))
+
+        #Si el angulo no es cero rotamos la superficie
+        if angle != 0:
+            temp_surface = py.transform.rotate(temp_surface, angle)
+        
+        #Calculamos el rect para centrarlo y que no se mueva raro si rota
+        surface_rect = temp_surface.get_rect()
+        surface_rect.center = (rect[0], rect[1])
+        
+        self.screen.blit(temp_surface, (surface_rect))
 
     def render_rectangle(self, rect: tuple[int, int, int, int], alpha: int, angle: int = 0) -> None:
         """Dibuja un rectangulo negro centrado dada una tupla de coordenadas (x, y, width, height), y una opacidad"""
-        final_x = rect[0] - rect[2] // 2
-        final_y = rect[1] - rect[3] // 2
+        #Dibujamos en una surface temporal
         temp_surface = py.Surface((rect[2], rect[3]), py.SRCALPHA)
         color_alpha = (0, 0, 0, alpha)  # Color negro con opacidad variable
         py.draw.rect(temp_surface, color_alpha, (0, 0, rect[2], rect[3]))
+
+        #Si el angulo no es cero rotamos la superficie
         if angle != 0:
             temp_surface = py.transform.rotate(temp_surface, angle)
-        self.screen.blit(temp_surface, (final_x, final_y))
+
+        #Calculamos el rect para centrarlo y que no se mueva raro si rota
+        surface_rect = temp_surface.get_rect()
+        surface_rect.center = (rect[0], rect[1])
+
+        self.screen.blit(temp_surface, (surface_rect))
 
 
     

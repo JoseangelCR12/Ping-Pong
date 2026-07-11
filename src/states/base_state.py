@@ -15,16 +15,10 @@ class BaseState:
         #Flag booleano para retroceder en la pila de estados
         self.pop_request = False
 
-    def enter(self, datos=None): 
+    def enter(self): 
         pass
 
     def exit(self): 
-        pass
-
-    def pause(self): 
-        pass
-
-    def resume(self): 
         pass
 
     def handle_input(self, events: list[py.event.Event]) -> None:

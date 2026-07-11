@@ -24,26 +24,26 @@ class StateManager:
                 state.render(screen)
             self._current_state.render(screen)
 
-    def change_state(self, new_state, datos=None):
+    def change_state(self, new_state):
         if self._current_state:
             self._current_state.exit()
         self._states_stack.clear()
         self._current_state = new_state
-        self._current_state.enter(datos)
+        self._current_state.enter()
 
-    def _push_state(self, new_state, datos=None):
+    def _push_state(self, new_state):
         if self._current_state:
-            self._current_state.pause()
+            self._current_state.exit()
             self._states_stack.append(self._current_state)
         self._current_state = new_state
-        self._current_state.enter(datos)
+        self._current_state.enter()
 
     def _pop_state(self):
         if self._current_state:
             self._current_state.exit()
         if self._states_stack:
             self._current_state = self._states_stack.pop()
-            self._current_state.resume()
+            self._current_state.enter()
         else:
             self._current_state = None
 

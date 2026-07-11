@@ -1,3 +1,4 @@
 __pycache__/
 perfil.prof
 .venv
+save/user_settings.json

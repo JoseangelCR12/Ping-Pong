@@ -20,14 +20,23 @@ class OptionsState(BaseState):
         self.audio.play_music("OPTIONS", "dopodime")
         #
 
+    def enter(self):
+        #Cargamos la ui y guardamos los subdiccionarios de elementos
         self.ui_elements = load_ui("OPTIONS", self.resource_manager)
         self.buttons = self.ui_elements["buttons"]
         self.icons = self.ui_elements["icons"]
         self.sliders = self.ui_elements["sliders"]
 
+        #Sincronizacion de los sliders con los ajustes
+        self.sliders["volume_music"].value = settings.data.get("volume_music", 0.7)
+        self.sliders["volume_sfx"].value = settings.data.get("volume_sfx", 0.7)
+
         #listas para ciclar las opciones al presionar los botones
         self.themes = ["classic", "udo"]
         self.cameras = ["standard", "fisheye"]
+
+    def exit(self):
+        pass
 
     def handle_input(self, events : list[py.event.Event]) -> None:
         for event in events:
@@ -65,6 +74,12 @@ class OptionsState(BaseState):
                 settings.save_to_file()
                 self.audio.update_music_volume()
             
+            elif self.sliders["volume_sfx"].handle_input(event):
+                #modificamos el volumen de los sfx, guardamos en memoria y llamamos al gestor de audio
+                new_volume = self.sliders["volume_sfx"].value
+                settings.set_sfx_volume(new_volume)
+                settings.save_to_file()
+
     
     def update(self, dt: float) -> None:
         mouse_pos = py.mouse.get_pos()

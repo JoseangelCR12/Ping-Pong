@@ -44,7 +44,46 @@ OPTIONS = {
 
         "sliders": [
             {
-                "name": "volume_music", "position": "center", "offset_x": 0, "offset_y": 0,
+                "name": "volume_music", "position": "top_center", "offset_x": 30, "offset_y": 90,
+                "min_value": 0.0, "max_value": 1.0, "init_value": 0.7,
+                "textures": ["btn_theme_h", "btn_theme", "btn_theme", "btn_theme_h"]
+            },
+            {
+                "name": "volume_sfx", "position": "center", "offset_x": 30, "offset_y": 0,
+                "min_value": 0.0, "max_value": 1.0, "init_value": 0.7,
+                "textures": ["btn_theme_h", "btn_theme", "btn_theme", "btn_theme_h"]
+            }
+        ]
+}
+
+PAUSE = { 
+        "buttons": [
+            {
+                "name": "menu", "position": "bottom_center", "offset_x": -120, "offset_y": -90,
+                "textures": ["btn_theme", "btn_theme_h"]
+            },
+            {
+                "name": "restart", "position": "bottom_center", "offset_x": 120, "offset_y": -90,
+                "textures": ["btn_theme", "btn_theme_h"]
+            }
+            
+        ],
+
+        "icons": [
+            {
+                "name": "underlay", "position": "center", "offset_x": 0, "offset_y": 0,
+                "texture": "underlay"
+            }
+        ],
+
+        "sliders": [
+            {
+                "name": "volume_music", "position": "top_center", "offset_x": 30, "offset_y": 90,
+                "min_value": 0.0, "max_value": 1.0, "init_value": 0.7,
+                "textures": ["btn_theme_h", "btn_theme", "btn_theme", "btn_theme_h"]
+            },
+            {
+                "name": "volume_sfx", "position": "center", "offset_x": 30, "offset_y": 0,
                 "min_value": 0.0, "max_value": 1.0, "init_value": 0.7,
                 "textures": ["btn_theme_h", "btn_theme", "btn_theme", "btn_theme_h"]
             }

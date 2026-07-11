@@ -13,13 +13,14 @@ class MenuState(BaseState):
         super().__init__(resource_manager)
         self.audio = audio
 
+    def enter(self): 
+        py.event.set_grab(False)  # Deja mover el mouse libremente fuera de la ventana
+        
+        #Cargamos la ui y guardamos los subdiccionarios de elementos
         self.ui_elements = load_ui("MENU", self.resource_manager)
         self.buttons = self.ui_elements["buttons"]
         self.icons = self.ui_elements["icons"]
 
-
-    def enter(self, datos=None): 
-        pass
 
     def exit(self): 
         pass

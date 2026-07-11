@@ -48,8 +48,8 @@ class Slider(Button):
             self.bar_rect.topleft = screen_rect.topleft
         
         #Ajustes de posición en píxeles
-        self.bar_rect.x += self.offset_x
-        self.bar_rect.y += self.offset_y
+        self.bar_rect.x += self.bar_offset_x
+        self.bar_rect.y += self.bar_offset_y
 
         #Actualizamos la posicion del botor inicador de la clase padre
         self.is_positioned = True #Para que no se desubique despues 
@@ -73,6 +73,7 @@ class Slider(Button):
     def handle_input(self, event: py.event.Event): 
         if not self.bar_is_positioned:
             return False
+        
         change_value = False
 
         #Activar arrastre si mantienes presionado click sobre el boton
@@ -107,7 +108,7 @@ class Slider(Button):
                 self._update_btn_pos()
     
             #retenemos la textura hover mientras arrastramos el boton
-            self.is_hover = True
+            self.is_hovered = True
             self.image = self.image_hover
             
 
@@ -116,7 +117,7 @@ class Slider(Button):
         if not self.bar_is_positioned:
             self._calculate_bar_position(screen)
 
-        #Barra de fondo aclada
+        #Barra de fondo anclada
         screen.blit(self.image_empty, self.bar_rect)
 
         #Barra de relleno
