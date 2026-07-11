@@ -1,7 +1,7 @@
 import config
 
 class Paddle:
-    def __init__(self, start_x, start_y, start_z=config.PADDLE_HEIGHT // 2):
+    def __init__(self, start_x, start_y, start_z=0):
         self.x = start_x
         self.y = start_y
         self.z = start_z
@@ -21,22 +21,18 @@ class Paddle:
         self.width = config.PADDLE_WIDTH
         self.thickness = config.PADDLE_THICKNESS 
         self.height = config.PADDLE_HEIGHT
-    
+        
         #Flag para rotar 180 grados la raqueta
         self.twiddle = False
-
+    
     def get_limits(self):
         """Retorna los limites de la raqueta en el frame actual (min_x, max_x, min_y, max_y, min_z, max_z), además de el angulo de rotacion de la raqueta"""
         return (self.x - self.width // 2, self.x + self.width // 2,
                 self.y - self.thickness // 2, self.y + self.thickness // 2,
-                self.z - self.height // 2, self.z + self.height // 2, self.angle)
+                self.z - self.height // 2, self.z + self.height // 2, self.angle, self.twiddle)
 
-    def calculate_vel(self, dt):
-        #calcula la velocidad de la raqueta en cada frame
-        if dt > 0:
-            self.vx = (self.x - self.last_x)/ dt
-
-    def mouse_to_world(self, mouse_sx: int, mouse_sy: int, z_delta: int):
+            
+     def mouse_to_world(self, mouse_sx: int, mouse_sy: int, z_delta: int):
         """
         Traduce las coordenadas 2D del mouse a coordenadas 3D para la raqueta (world_x, world_y)
         Actua como clampeo de la raqueta a la mesa
@@ -49,15 +45,19 @@ class Paddle:
         world_x = int(mouse_sx - config.WINDOW_WIDTH // 2) * x_proportion
     
         self.update_pos(world_x, world_y, z_delta)
-
-    def update_pos(self, target_x, target_y, z_delta):
-        """Actualiza la posicion de la raqueta en el espacio 3D, limitando la altura y calculando el angulo de rotacion en X"""
-        self._angle_x(target_x)
+        
+    def update_pos(self, target_x, target_y, z_delta, dt):
+     """Actualiza la posicion de la raqueta en el espacio 3D, limitando la altura y calculando el angulo de rotacion en X"""
+        self._angle_x(target_x)    
         self.x = target_x
         self.y = target_y
+
         #Limite de altura
         self.z = max(config.MIN_PADDLE_Z, min(self.z + z_delta, config.MAX_PADDLE_Z))
-    
+
+        #Cada vez que se mueve, se calcula su velocidad
+        self.calculate_vel(dt)
+     
     def _angle_x(self, target_x):
         """Calcula el angulo de rotacion de la raqueta en el eje X en funcion de la posicion del mouse"""
         #Limite de angulo
