@@ -30,7 +30,7 @@ class Paddle:
         """Retorna los limites de la raqueta en el frame actual (min_x, max_x, min_y, max_y, min_z, max_z), además de el angulo de rotacion de la raqueta"""
         return (self.x - self.width // 2, self.x + self.width // 2,
                 self.y - self.thickness // 2, self.y + self.thickness // 2,
-                self.z - self.height // 2, self.z + self.height // 2, self.angle, self.twiddle)
+                self.z - self.height // 2, self.z + self.height // 2, self.angle)
 
             
     def mouse_to_world(self, mouse_sx: int, mouse_sy: int, z_delta: int, dt):
@@ -61,7 +61,14 @@ class Paddle:
 
         #calcula su velocidad cada que se mueve
         self._calculate_vel(dt)
-     
+    
+
+    def get_restitution(self):
+        """Retorna la restitución elástica activa según la cara de la raqueta (Responsabilidad Única)"""
+        if self.twiddle:
+            return config.PADDLE_RESTITUTION  # Goma cara A
+        return config.PADDLE_BACK_RESTITUTION # Goma cara B (Revés)
+
     def _calculate_vel(self, dt):
         #calcula la velocidad de la raqueta en cada frame
         if dt > 0:

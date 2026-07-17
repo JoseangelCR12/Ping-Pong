@@ -1,20 +1,19 @@
 import config
 
 class Ball:
-    def __init__(self, start_x, start_y, start_z=0):
+    def __init__(self, start_x=0.0, start_y=0.0, start_z=0.0):
+        #Datos de posición
         self.x = start_x
         self.y = start_y
         self.z = start_z
 
-        #última posición para calcular velocidades que el modulo fisica usará
-        self.last_x = start_x
-        self.last_y = start_y
-        self.last_z = start_z
+        #Datos de velocidad
+        self.vx = 0.0
+        self.vy = 0.0
+        self.vz = 0.0
 
-        #velocidades
-        self.vx = 0
-        self.vy = 0
-        self.vz = 0
+        #Propiedades físicas pasivas de la pelota
+        self.restitution = config.BALL_RESTITUTION
 
         #las dimensiones de la pelota (la hitbox será un cubo)
         self.radius = config.BALL_RADIUS
@@ -27,19 +26,8 @@ class Ball:
                 self.y - self.radius, self.y + self.radius,
                 self.z - self.radius, self.z + self.radius)
 
-
-    def update_pos(self, target_x, target_y, target_z, dt):
-        
+    def update_pos(self, new_x, new_y, new_z):
+        """Método público para actualizar la posición de renderizado"""
         self.x = target_x
         self.y = target_y
         self.z = target_z
-
-        #Calcula su velocidad cada que se mueve
-        self._calculate_vel(dt)
-
-    def _calculate_vel(self, dt):
-        #calcula la velocidad de la pelota 
-        if dt > 0:
-            self.vx = (self.x - self.last_x) / dt
-            self.vy = (self.y - self.last_y) / dt
-            self.vz = (self.z - self.last_z) / dt

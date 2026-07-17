@@ -1,160 +1,107 @@
 import config
+import math
 
-class Physics:
-
-    """Agarramos las Variables de posicion y velocidad del objeto e inicializamos la gravedad, aceleracion y restitucion"""
-
-    def __init__(self, x = 0.0, y = 0.0, z = 0.0, vx = 0.0, vy = 0.0, vz = 0.0):
-
-        self.speed.x = vx
-        self.speed.y = vy
-        self.speed.z = vz
-        self.position.x = x
-        self.position.y = y
-        self.position.z = z
-        self.gravity = config.GRAVITY
-        self.restitution = config.BALL_RESTITUTION
-        self.net_restitution = config.NET_RESTITUTION
-        self.paddle_restitution = config.PADDLE_RESTITUTION
-        self.paddle_back_restitution = config.PADDLE_BACK_RESTITUTION
-        self.vertical_braking = config.VERTICAL_BRAKING
-
-    def gravity(self):
-
-        """Aplica la Gravedad en la velocidad"""
-
-        self.speed.z -= self.gravity / 60.0 
-
-    def table_bounce(self, table_limits):   
+class PhysicsEngine:
     
-        """Calcula la colision con la mesa y actualiza la velocidad de la pelota"""
+    @staticmethod
+    def apply_gravity(ball, dt):
+        """Aplica la gravedad modificando la velocidad Z de la entidad pelota"""
+        #Modifica la velocidad directamente en los atributos de la pelota
+        ball.vz -= (config.GRAVITY * dt)
+
+    @staticmethod
+    def apply_friction(ball):
+        """Aplica la fricción del aire en los ejes X e Y"""
+        ball.vx *= config.FRICTION
+        ball.vy *= config.FRICTION
+
+    @staticmethod
+    def update_ball_position(ball, dt):
+        """Actualiza la posición de la pelota basándose en su velocidad actual"""
+        new_x = ball.x + (ball.vx * dt)
+        new_y = ball.y + (ball.vy * dt)
+        new_z = ball.z + (ball.vz * dt)
+        ball.update_pos(new_x, new_y, new_z)
+
+    @staticmethod
+    def check_surface_collision(ball, limits):
+        """
+        Verifica colisión genérica con una superficie (como la mesa o el piso).
+        Retorna un booleano (False si no hay, True si golpeó).
+        """
+        min_x, max_x, min_y, max_y, min_z, max_z = limits
         
-        #Limites de la mesa
-        min_table_x, max_table_x, min_table_y, max_table_y, min_table_z, max_table_z = table_limits
-    
-        #Limites de Clampeo
-        is_withing_x = min_table_x <= self.position.x <= max_table_x
-        is_withing_y = min_table_y <= self.position.y <= max_table_y  
-        has_hit_surface = min_table_z <= self.position.z <= max_table_z 
+        is_within_x = min_x <= ball.x <= max_x
+        is_within_y = min_y <= ball.y <= max_y
+        has_hit_surface = min_z <= ball.z <= max_z
 
-        #Aplicando el impacto con la mesa si la pelota esta dentro de los limites de la mesa
-        if is_withing_x and is_withing_y and has_hit_surface:
-                self.position.z  = max_table_z
-                self.speed.z *= -self.restitution
-
-    def floor_bounce(self):
-
-        """Inicializamos el piso y aplicamos el rebote"""
-
-        floor_z = config.FLOOR_Z
-
-        #Si la pelota pasa el piso en 1 frame, la regresa al piso y rebota
-        if self.position.z <= floor_z:
-                self.position.z = floor_z
-                self.speed.z *= -self.restitution
-                return True
-              
+        if is_within_x and is_within_y and has_hit_surface:
+            #Rebotar la pelota e inyectar la nueva posición en el tope de la superficie
+            ball.z = max_z
+            ball.vz *= -ball.restitution
+            return True #Contador de rebotes/colisiones para las gamerules
+        
         return False
 
-    def net_bounce(self, net_limits):
-
-        """Calcula el Rebote de la pelota con la malla"""
-
-        min_net_x, max_net_x, min_net_y, max_net_y, min_net_z, max_net_z = net_limits
+    @staticmethod
+    def check_net_collision(ball, net_limits):
+        """
+        Verifica la colisión con la caja de la malla.
+        Retorna un booleano (False si no hay, True si chocó).
+        """
+        min_x, max_x, min_y, max_y, min_z, max_z = net_limits
         
-        #Comprobando si esta en los limites de la red
-        is_withing_x = min_net_x <= self.position.x <= max_net_x
-        is_withing_y = min_net_y <= self.position.y <= max_net_y
-        is_withing_z = min_net_z <= self.position.z <= max_net_z
-
-        #Si entra en la caja se aplica el impacto
-        if is_withing_x and is_withing_y and is_withing_z:
-                
-        #Si va desde el jugador al cpu
-                if self.speed.y > 0:
-                        self.position.y = min_net_y
-
-        #Si va desde el cpu al jugador
-                else:
-                     self.position.y = max_net_y
-
-        #Aplica la restitucion a la pelota
-                self.speed.y *= -self.net_restitution
-
-        #Frena un poco su velocidad vertical
-                self.speed.z *= self.vertical_braking
-
-    def calculate_entity_vel(self, entity, dt):
-
-        """Metodo que calcula la velocidad de todas las entidades"""
-
-        #Calcula la velocidad de la raqueta en cada frame
-        if dt > 0:
-            vx = (entity.x - entity.last_x)/ dt
-            vy = (entity.y - entity.last_y)/ dt
-            vz = (entity.z - entity.last_z)/ dt
-
-        #Guardamos el resultado en los atributos a la entidad
-            entity.vx = vx
-            entity.vy = vy
-            entity.vz = vz
-
-        #Actualiza el historial de la raqueta
-            entity.last_x = entity.x
-            entity.last_y = entity.y
-            entity.last_z = entity.z
-
-            return vx, vy, vz
-        
-        return 0.0, 0.0, 0.0
-
-    def paddle_bounce(self, paddle, dt):
-    
-        min_paddle_x, max_paddle_x, min_paddle_y, max_paddle_y, min_paddle_z, max_paddle_z, angle, twiddle = paddle.get_limits()
-        paddle_vx, paddle_vy, paddle_vz = self.calculate_entity_vel(paddle, dt)
-
-        is_within_x = min_paddle_x <= self.position.x <= max_paddle_x
-        is_within_y = min_paddle_y <= self.position.y <= max_paddle_y
-        is_within_z = min_paddle_z <= self.position.z <= max_paddle_z
-
-        if is_within_x and is_within_y and is_within_z:
-
-            if self.speed.y < 0:
-                self.position.y = max_paddle_y
-
-            else:
-                self.position.y = min_paddle_y
-
-            if twiddle:
-                current_restitution = self.paddle_restitution
-            else:
-                current_restitution = self.paddle_back_restitution
+        if (min_x <= ball.x <= max_x and 
+            min_y <= ball.y <= max_y and 
+            min_z <= ball.z <= max_z):
             
-            self.speed.y *= -current_restitution
+            #Determinar dirección para posicionar la pelota fuera de la red
+            if ball.vy > 0:
+                ball.y = min_y
+            else:
+                ball.y = max_y
+                
+            ball.vy *= -config.NET_RESTITUTION
+            ball.vz *= config.VERTICAL_BRAKING
+            return True
+            
+        return False
 
-            self.speed.x += paddle_vx * 0.5
-            self.speed.y += paddle_vy * 1.0
-            self.speed.z += paddle_vz * 0.5
+    @staticmethod
+    def check_paddle_collision(ball, paddle, dt=1/60.0):
+        """Verifica la colisión tridimensional reactiva entre la pelota y cualquier raqueta"""
+        min_x, max_x, min_y, max_y, min_z, max_z, angle, twiddle = paddle.get_limits()
 
-        else:
-            self.calculate_entity_vel(paddle, dt)
-    
-    def movement_update(self, table_limits, net_limits, paddle, dt):
+        # Comprobación de la caja de colisión (Hitbox) AABB en 3D
+        if (min_x <= ball.x <= max_x and 
+            min_y <= ball.y <= max_y and 
+            min_z <= ball.z <= max_z):
+            
+            # Ajuste de posición para evitar que la pelota atraviese la raqueta en Y
+            # Si el paddle es de la CPU (está en la mitad superior del mapa)
+            if paddle.is_cpu:
+                ball.y = min_y - 2  # Colocar la pelota justo en frente de la raqueta
+                # Forzamos a que la pelota vaya hacia el jugador (-Y) combinando restituciones
+                current_restitution = paddle.get_restitution()
+                ball.vy = -abs(ball.vy) * current_restitution
+            else:
+                ball.y = max_y + 2  # Colocar la pelota en frente de la raqueta del jugador
+                # Forzamos a que la pelota vaya hacia la CPU (+Y)
+                current_restitution = paddle.get_restitution()
+                ball.vy = abs(ball.vy) * current_restitution
 
-        """Metodo que se encarga de actualizar el movimiento del juego"""
+            # Aplicamos la desviación trigonométrica reactiva por el ángulo físico
+            angle_rad = math.radians(angle)
+            base_impulse_y = paddle.vy * 1.0
 
-        #Metodo que controla la Gravedad
-        self.gravity()
+            rotated_impulse_x = base_impulse_y * math.sin(angle_rad)
+            rotated_impulse_y = base_impulse_y * math.cos(angle_rad)
 
-        self.speed.x *= config.FRICTION
-        self.speed.y *= config.FRICTION
-        #Metodos que se encargan del rebote de la pelota
-        self.table_bounce(table_limits)
-        self.net_bounce(net_limits)
-        self.paddle_bounce(paddle, dt)
-        self.floor_bounce()
-
-        #Actualizacion de la posicion en base a la velocidad
-        self.position.x += self.speed.x
-        self.position.y += self.speed.y
-        self.position.z += self.speed.z 
+            # Transferencia de velocidades reales acumuladas por el movimiento del paddle
+            ball.vx += (paddle.vx * 0.5) + rotated_impulse_x
+            ball.vy += rotated_impulse_y
+            ball.vz += paddle.vz * 0.5
+            
+            return True
+            
+        return False
