@@ -16,10 +16,6 @@ class OptionsState(BaseState):
         self.audio = audio
         self.renderer = renderer
 
-        #
-        self.audio.play_music("OPTIONS", "dopodime")
-        #
-
     def enter(self):
         #Cargamos la ui y guardamos los subdiccionarios de elementos
         self.ui_elements = load_ui("OPTIONS", self.resource_manager)
@@ -30,13 +26,16 @@ class OptionsState(BaseState):
         #Sincronizacion de los sliders con los ajustes
         self.sliders["volume_music"].value = settings.data.get("volume_music", 0.7)
         self.sliders["volume_sfx"].value = settings.data.get("volume_sfx", 0.7)
+        self.sliders["wheel_sensitivity"].value = settings.data.get("wheel_sensitivity", 15)  
+
 
         #listas para ciclar las opciones al presionar los botones
-        self.themes = ["classic", "udo"]
+        self.themes = ["classic", "udo", "purple"]
         self.cameras = ["standard", "fisheye"]
 
-    def exit(self):
-        pass
+        #
+        self.audio.play_music("OPTIONS", "dopodime")
+        #
 
     def handle_input(self, events : list[py.event.Event]) -> None:
         for event in events:
@@ -55,8 +54,8 @@ class OptionsState(BaseState):
                 self.resource_manager.cache.clear_all()
 
                 #Forzamos a la UI a recargarse
-                self.ui_elements = load_ui("OPTIONS", self.resource_manager)
-
+                self.enter()
+                
             elif self.buttons["change_camera"].handle_input(event):
                 #Buscamos el siguiente modo de camara
                 current_idx = self.cameras.index(settings.data["camera_mode"])
@@ -75,9 +74,15 @@ class OptionsState(BaseState):
                 self.audio.update_music_volume()
             
             elif self.sliders["volume_sfx"].handle_input(event):
-                #modificamos el volumen de los sfx, guardamos en memoria y llamamos al gestor de audio
+                #modificamos el volumen de los sfx y guardamos en memoria
                 new_volume = self.sliders["volume_sfx"].value
                 settings.set_sfx_volume(new_volume)
+                settings.save_to_file()
+
+            elif self.sliders["wheel_sensitivity"].handle_input(event):
+                #modificamos la sensibilidad de la ruedita del mouse y guardamos en memoria
+                new_sensitivity = self.sliders["wheel_sensitivity"].value
+                settings.set_wheel_sensitivity(new_sensitivity)
                 settings.save_to_file()
 
     
@@ -90,8 +95,9 @@ class OptionsState(BaseState):
             slider.update(mouse_pos)
     
     def render(self, screen: py.Surface) -> None:
+        #EL velo osucro del menu de opciones
         screen_tuple = (config.WINDOW_WIDTH // 2, config.WINDOW_HEIGHT // 2, *config.WINDOW_SIZE)
-        self.renderer.render_rectangle(screen_tuple, 100)
+        self.renderer.render_rectangle(screen_tuple, 50)
 
         for icon in self.icons.values():
             icon.draw(screen)

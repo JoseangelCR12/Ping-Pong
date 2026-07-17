@@ -18,5 +18,8 @@ if __name__ == "__main__":
 
     #REVISA LO QUE VA CAMBIANDO DIEGO Y COMPAGINEN BIEN LOS CAMBIOS Y LAS FISICAS
 
-    #AGREGA IMPLEMENTACIONES A ENTER Y EXIT EN LOS STATES(PARA QUE GUARDEN Y BORREN CACHE) 
-    # EN LOS ENTER Y EXIT PUEDES PONER MUCHAS COSAS PQ SIEMPRE SE REALIZARAN, APROVECHALOS QDARA MAS BONITO
+
+    #TErmnia lo visual de menus y eso, te faltan unos sprites, unos background y listo
+
+    #Integren fisican, hagan gamerules y arregles las cpus, y habran terminado, USTEDES PUEDEN
+    #ah, y hagan los creditos

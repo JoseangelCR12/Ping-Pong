@@ -3,7 +3,7 @@ from .button import Button
 
 class Slider(Button):
     def __init__(self, position_type: str, offset_x: int, offset_y: int,
-                min_value: float, max_value: float, init_value: float,
+                min_value, max_value, init_value,
                 image_empty: py.Surface, #Imagen de la barra vacia
                 image_full: py.Surface, #Imagen de la barra llena
                 image_btn: py.Surface,  #Imagen del boton deslizante
@@ -23,12 +23,11 @@ class Slider(Button):
         self.min = min_value
         self.max = max_value
         self.value = max(self.min, min(self.max, init_value))
-
-        
+                
         #Assets de las barras
         self.image_empty = image_empty
         self.image_full = image_full
-        self.bar_rect = self.image.get_rect() #creamos el rect base usando las dimensiones de la barra de fondo
+        self.bar_rect = self.image_empty.get_rect() #creamos el rect base usando las dimensiones de la barra de fondo
         
         self.sliding = False
     
@@ -98,10 +97,14 @@ class Slider(Button):
         #Logica de deslizamiento
         
         if self.sliding:
-            #Forzamos al del mouse a no salirse de los limites de la barra
+            #Forzamos al mouse a no salirse de los limites de la barra
             mouse_x = max(self.bar_rect.x, min(mouse_pos[0], self.bar_rect.x + self.bar_rect.width))
             new_percentage = (mouse_x - self.bar_rect.x) / self.bar_rect.width  
-            new_value = self.min + new_percentage * (self.max - self.min)  
+            new_value = self.min + new_percentage * (self.max - self.min) 
+
+            if isinstance(self.min, int) and isinstance(self.max, int):
+                #Si los valores son enteros hacemos el slide discreto, si no el movimiento es continuo
+                new_value = int(new_value) 
 
             if new_value != self.value:
                 self.value = new_value

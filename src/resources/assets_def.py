@@ -1,11 +1,10 @@
 GLOBAL = {
     "sprites": {
-        "underlay": "assets/ui/{theme}/icons/underlay.png",
-        "btn_theme": "assets/ui/{theme}/buttons/btn_theme.png", 
-        "btn_theme_h": "assets/ui/{theme}/buttons/btn_theme_h.png"
     },
     "music": {
-        "dopodime": "assets/audio/dopodime.ogg"
+    },
+    "font":{
+        "main_font": "assets/font/Retro Gaming.ttf"
     }
     }
 
@@ -28,6 +27,7 @@ PLAY = {
     "sprites": {
         "floor": "assets/background/{theme}/floor.png",
         "table": "assets/entities/{theme}/table.png",
+        "table_edge": "assets/entities/{theme}/table_edge.png",
         "ball": "assets/entities/ball.png"
     },
     "spritesheets": {
@@ -41,7 +41,13 @@ OPTIONS = {
     "sprites": {
         "underlay": "assets/ui/{theme}/icons/underlay.png",
         "btn_theme": "assets/ui/{theme}/buttons/btn_theme.png", 
-        "btn_theme_h": "assets/ui/{theme}/buttons/btn_theme_h.png"
+        "btn_theme_h": "assets/ui/{theme}/buttons/btn_theme_h.png",
+        "btn_camera": "assets/ui/{theme}/buttons/btn_camera.png", 
+        "btn_camera_h": "assets/ui/{theme}/buttons/btn_camera_h.png",
+        "slider_bar_e": "assets/ui/sliders/slider_bar_e.png",
+        "slider_bar_f": "assets/ui/sliders/slider_bar_f.png",
+        "slider_btn": "assets/ui/{theme}/buttons/slider_btn.png",
+        "slider_btn_h": "assets/ui/{theme}/buttons/slider_btn_h.png"
     },
     "sound": {},
     "music": {
@@ -50,5 +56,33 @@ OPTIONS = {
     }
     }
 
+PAUSE = {
+    "sprites": {
+        "underlay": "assets/ui/{theme}/icons/underlay.png",
+        "btn_theme": "assets/ui/{theme}/buttons/btn_theme.png", 
+        "btn_theme_h": "assets/ui/{theme}/buttons/btn_theme_h.png",
+        "slider_bar_e": "assets/ui/sliders/slider_bar_e.png",
+        "slider_bar_f": "assets/ui/sliders/slider_bar_f.png",
+        "slider_btn": "assets/ui/{theme}/buttons/slider_btn.png",
+        "slider_btn_h": "assets/ui/{theme}/buttons/slider_btn_h.png"
+    },
+    "sound": {},
+    "music": {
+        "dopodime": "assets/audio/dopodime.ogg"
+    }
+    }
+
+SELECTION = {
+    "sprites": {
+        "small_underlay": "assets/ui/{theme}/icons/small_underlay.png",
+        "btn_play": "assets/ui/{theme}/buttons/btn_play.png", 
+        "btn_play_h": "assets/ui/{theme}/buttons/btn_play_h.png",
+        "slider_bar_e": "assets/ui/sliders/slider_bar_e.png",
+        "cpu_bar_f": "assets/ui/sliders/cpu_bar_f.png",
+        "slider_btn": "assets/ui/{theme}/buttons/slider_btn.png",
+        "slider_btn_h": "assets/ui/{theme}/buttons/slider_btn_h.png"
+    },
+    "sound": {}
+    }
 
 

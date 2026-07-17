@@ -1,5 +1,5 @@
 import pygame as py
-from ..core import settings
+from ..core.settings import data
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -20,7 +20,7 @@ class Audio:
 
             if sound:
                 #sincronizamos el volumen leyendo los ajustes
-                volume = settings.data.get("volume_sfx", 0.7)
+                volume = data.get("volume_sfx", 0.7)
                 sound.set_volume(volume)
 
                 sound.play()
@@ -58,5 +58,5 @@ class Audio:
 
     def update_music_volume(self) -> None:
         "Actualiza instantaneamente el volumen"
-        volume = settings.data.get("volume_music", 0.5)
+        volume = data.get("volume_music", 0.5)
         py.mixer.music.set_volume(volume)

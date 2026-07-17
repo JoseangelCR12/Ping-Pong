@@ -33,7 +33,7 @@ class StateManager:
 
     def _push_state(self, new_state):
         if self._current_state:
-            self._current_state.exit()
+            self._current_state.pause()
             self._states_stack.append(self._current_state)
         self._current_state = new_state
         self._current_state.enter()
@@ -43,7 +43,7 @@ class StateManager:
             self._current_state.exit()
         if self._states_stack:
             self._current_state = self._states_stack.pop()
-            self._current_state.enter()
+            self._current_state.resume()
         else:
             self._current_state = None
 

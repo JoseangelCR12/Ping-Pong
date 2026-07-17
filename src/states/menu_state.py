@@ -1,5 +1,4 @@
 import pygame as py
-import config
 from .base_state import BaseState
 from ..ui.ui_loader import load_ui
 from typing import TYPE_CHECKING
@@ -13,22 +12,23 @@ class MenuState(BaseState):
         super().__init__(resource_manager)
         self.audio = audio
 
+    def resume(self):
+        #Recargamos la ui al venir del menu de opciones
+        self.enter()
+
     def enter(self): 
         py.event.set_grab(False)  # Deja mover el mouse libremente fuera de la ventana
-        
+        py.mouse.set_visible(True) # Mouse visible
+
         #Cargamos la ui y guardamos los subdiccionarios de elementos
         self.ui_elements = load_ui("MENU", self.resource_manager)
         self.buttons = self.ui_elements["buttons"]
         self.icons = self.ui_elements["icons"]
 
-
-    def exit(self): 
-        pass
-
     def handle_input(self, events : list[py.event.Event]) -> None:
         for event in events:
             if self.buttons["play"].handle_input(event):
-                self.next_change_state = "PLAY"
+                self.next_push_state = "SELECTION"
             elif self.buttons["options"].handle_input(event):
                 self.next_push_state = "OPTIONS"
             elif self.buttons["credits"].handle_input(event):

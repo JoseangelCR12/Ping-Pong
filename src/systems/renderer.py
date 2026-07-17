@@ -47,7 +47,7 @@ class Renderer:
         final_y = (screen_y) - (new_h // 2)
         self.screen.blit(scaled_stack, (final_x, final_y))
 
-    def render_ellipse(self, rect: tuple[int, int, int, int], alpha: int, angle: int = 0) -> None:
+    def render_ellipse(self, canvas, rect: tuple[int, int, int, int], alpha: int, angle: int = 0) -> None:
         """Dibuja una elipse negra centrada dada una tupla de coordenadas (x, y, width, height), y una opacidad"""
         #Dibujamos en una surface temporal
         temp_surface = py.Surface((rect[2], rect[3]), py.SRCALPHA)
@@ -62,7 +62,7 @@ class Renderer:
         surface_rect = temp_surface.get_rect()
         surface_rect.center = (rect[0], rect[1])
         
-        self.screen.blit(temp_surface, (surface_rect))
+        canvas.blit(temp_surface, (surface_rect))
 
     def render_rectangle(self, rect: tuple[int, int, int, int], alpha: int, angle: int = 0) -> None:
         """Dibuja un rectangulo negro centrado dada una tupla de coordenadas (x, y, width, height), y una opacidad"""

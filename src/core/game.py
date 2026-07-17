@@ -30,14 +30,13 @@ class Game:
 
         # Instanciamos sistemas, gestor de caché y el gestor de recursos
         self.physics = Physics()
-        self.pseudo_3D = Pseudo3D()
         self.renderer = Renderer(self.screen)
         self.cache = CacheManager()
 
         self.resource_manager = ResourceManager(self.cache)
         self.audio = Audio(self.resource_manager)
 
-        self.world_renderer = WorldRenderer(self.resource_manager, self.renderer, self.pseudo_3D)
+        self.world_renderer = WorldRenderer(self.resource_manager, self.renderer)
 
         # Guardamos una referencia a las clase de las entidades para que el check_transitions funcione
         self.Paddle = Paddle

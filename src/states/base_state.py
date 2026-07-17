@@ -21,6 +21,12 @@ class BaseState:
     def exit(self): 
         pass
 
+    def pause(self):
+        pass
+
+    def resume(self):
+        pass
+
     def handle_input(self, events: list[py.event.Event]) -> None:
         raise NotImplementedError
     

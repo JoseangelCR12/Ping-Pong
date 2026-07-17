@@ -1,6 +1,7 @@
 from .button import Button
 from .icon import Icon
 from .slider import Slider
+from .text import Text
 from . import ui_config
 
 def load_ui(state_name, resource_manager):
@@ -8,7 +9,8 @@ def load_ui(state_name, resource_manager):
     ui_elements = {
         "buttons": {},
         "icons": {},
-        "sliders": {}
+        "sliders": {},
+        "texts": {}
     }
 
     state_dict = getattr(ui_config, state_name)
@@ -70,5 +72,24 @@ def load_ui(state_name, resource_manager):
             )
 
         ui_elements["sliders"][slider_data["name"]] = new_slider
+
+         #se busca la lista de textos de la pantalla
+    state_texts_data = state_dict.get("texts", [])
+
+    for text_data in state_texts_data:
+        font = resource_manager.get_font(state_name, text_data["font"], text_data["size"])
+       
+        
+        new_text = Text(
+            position_type=text_data["position"],
+            offset_x=text_data["offset_x"],
+            offset_y=text_data["offset_y"],
+            message=text_data["message"],
+            color=text_data["color"],
+            font=font,
+            antialias=text_data["antialias"]
+            )
+        
+        ui_elements["texts"][text_data["name"]] = new_text
     
     return ui_elements

@@ -69,7 +69,7 @@ class ResourceManager:
         self.cache.save(rotated_cache_key, rotated_layers)
         return rotated_layers       
 
-    def get_scaled_strip(self, texture_surface: py.Surface, texture_key: str, line, line_width, line_height = 1):
+    def get_scaled_strip(self, texture_surface: py.Surface, texture_key: str, line, line_width, line_height):
         """
         Devuelve un subsurface horizontal (una tira) a partir de un surface
         """
@@ -115,6 +115,19 @@ class ResourceManager:
         music_path = self._get_path_from_dict(state_name, "music", music_key)
         return music_path
 
+    def get_font(self, state_name, font_key, font_size):
+        """
+        Devuelve un archivo font despues de cargarlo
+        """
+        # Creamos una clave para el cache combinando el nombre del estado y el de la fuente, asi como su tamaño
+        cache_key = f"{state_name}_{font_key}_{font_size}_font"
+        cached_font = self.cache.get(cache_key)
+        if cached_font is not None and isinstance(cached_font, py.font.Font):
+            return cached_font
+        
+        font = self._load_asset(state_name, "font", font_key, py.font.Font, font_size)
+        self.cache.save(cache_key, font)
+        return font
     
     #METODOS PRIVADOS AUXILIARES
     def _get_path_from_dict(self, state_name: str, category: str, key: str) -> str:
@@ -125,7 +138,6 @@ class ResourceManager:
         # Extraemos la ruta de la categoria dada del estado
         relative_path = state_data.get(category,{}).get(key)
         
-
         # Si no esta se busca globalmente
         if not relative_path:
             global_data = getattr(assets_def, "GLOBAL", {})
@@ -137,7 +149,7 @@ class ResourceManager:
         
         return relative_path
     
-    def _load_asset(self, state_name: str, category: str, key: str, load_function: Any) -> Any:
+    def _load_asset(self, state_name: str, category: str, key: str, load_function: Any, font_size = None) -> Any:
         """Consigue la ruta, la limpia(para que sea independiente del OS) y ejecuta la carga de Pygame"""
         relative_path = self._get_path_from_dict(state_name, category, key)
         
@@ -148,4 +160,9 @@ class ResourceManager:
         clean_path = get_asset_path(formatted_path)
 
         #ejecuta py.image.load o py.mixer.Sound segun la funcion recibida
-        return load_function(clean_path)
+        if font_size is None:
+            return load_function(clean_path)
+
+        #Se ejecuta py.font.Font para cargar las fuentes si se recibe en los argumentos un tamaño para esta
+        return load_function(clean_path, font_size)
+

@@ -4,6 +4,7 @@ from .menu_state import MenuState
 from .play_state import PlayState
 from .options_state import OptionsState
 from .pause_state import PauseState
+from .selection_state import SelectionState
 from .game_over_state import GameOverState
 from .win_state import WinState
 from .credits_state import CreditsState
@@ -15,6 +16,7 @@ __all__ = [
     "PlayState",
     "OptionsState",
     "PauseState",
+    "SelectionState",
     "GameOverState",
     "WinState",
     "CreditsState",
