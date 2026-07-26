@@ -18,7 +18,7 @@ class OptionsState(BaseState):
 
     def enter(self):
         #Cargamos la ui y guardamos los subdiccionarios de elementos
-        self.ui_elements = load_ui("OPTIONS", self.resource_manager)
+        self.ui_elements = load_ui("OPTIONS", self.resource_manager, self.audio)
         self.buttons = self.ui_elements["buttons"]
         self.icons = self.ui_elements["icons"]
         self.sliders = self.ui_elements["sliders"]

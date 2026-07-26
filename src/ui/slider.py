@@ -7,8 +7,9 @@ class Slider(Button):
                 image_empty: py.Surface, #Imagen de la barra vacia
                 image_full: py.Surface, #Imagen de la barra llena
                 image_btn: py.Surface,  #Imagen del boton deslizante
-                image_btn_h: py.Surface): #Imagen del boton deslizante cuando el raton esta encima
-        
+                image_btn_h: py.Surface, #Imagen del boton deslizante cuando el raton esta encima
+                on_slide=None): #Funcion que reproduce sonido al deslizar la barra
+
         #inicalizamos la clase base boton para que maneje el boton deslizante
         #El boton indicador es una instancia de la clase Button inicialmente ubicado en un lugar cualquiera, despues se acomoda
         super().__init__("top_left", 0, 0, image_btn, image_btn_h)
@@ -30,6 +31,9 @@ class Slider(Button):
         self.bar_rect = self.image_empty.get_rect() #creamos el rect base usando las dimensiones de la barra de fondo
         
         self.sliding = False
+
+        #Se almacena la funcion que reproduce sonido al deslizar
+        self.on_slide = on_slide
     
     def _calculate_bar_position(self, screen: py.Surface):
         screen_rect = screen.get_rect()
@@ -108,6 +112,8 @@ class Slider(Button):
 
             if new_value != self.value:
                 self.value = new_value
+                if isinstance(self.value, int) and self.on_slide: #Si el slider es discreto reproducimos sonido al deslizar
+                    self.on_slide()
                 self._update_btn_pos()
     
             #retenemos la textura hover mientras arrastramos el boton

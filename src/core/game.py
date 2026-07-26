@@ -38,10 +38,11 @@ class Game:
 
         self.world_renderer = WorldRenderer(self.resource_manager, self.renderer)
 
-        # Guardamos una referencia a las clase de las entidades para que el check_transitions funcione
+        # Guardamos una referencia a las clase de las entidades para que el check_transitions las inyecte
         self.Paddle = Paddle
         self.Ball = Ball
         self.Table = Table
+        self.Net = Net
 
         # Instanciamos el gestor de estados e iniciamos el menú
         self.state_manager = StateManager(states_factory=self.states_factory)

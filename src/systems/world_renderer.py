@@ -24,7 +24,7 @@ class WorldRenderer:
         """Limpia la cola al inicio de cada fotograma"""
         self._render_queue.clear()
 
-    def add_xz_element(self, element_x: int, element_y: int, element_z: int, state_name: str, texture_key: str, plane_surface_z: int, plane_min_y: int, element_depth: int, element_height: int, is_stack: bool=False, angle=0, surface=None, element_width=None):
+    def add_xz_element(self, element_x: int, element_y: int, element_z: int, state_name: str, texture_key: str, plane_surface_z: int, plane_min_y: int, element_depth: int, element_height: int, is_stack: bool=False, angle=0, surface=None, element_width=None, has_shadow: bool=True):
         """
         Registra una entidad vertical para que sea dibujada, mediante sprite stacking o como sprite normal, junto a su sombra eliptica si se da una superficie inferior, si dicha superficie es superior se toma como referencia de techo
         """
@@ -43,7 +43,7 @@ class WorldRenderer:
         self._render_queue.append({
             "sort_y": render_priority,
             "type": "xz",
-            "data": (element_x, element_y, element_z, state_name, texture_key, plane_surface_z, is_stack, angle, surface, element_width, element_depth)
+            "data": (element_x, element_y, element_z, state_name, texture_key, plane_surface_z, is_stack, angle, surface, element_width, element_depth, has_shadow)
         })
 
     def add_xy_element(self, element_x: int, element_y: int, element_z: int, element_half_width: int, element_half_depth: int, state_name: str, texture_key: str, plane_surface_z: int, surface: py.Surface, shadow_surface=None, shadows_on_top=False):
@@ -82,7 +82,7 @@ class WorldRenderer:
 
         #METODOS PRIVADOS DE DIBUJO
 
-    def _render_xz_element(self, element_x, element_y, element_z, state_name, texture_key, plane_surface_z, is_stack, angle, surface, element_width, element_depth):
+    def _render_xz_element(self, element_x, element_y, element_z, state_name, texture_key, plane_surface_z, is_stack, angle, surface, element_width, element_depth, has_shadow):
         """
         Dibuja en pantalla una entidad vertical (mediante sprite stacking o como sprite normal) junto a su sombra 
         """
@@ -90,7 +90,7 @@ class WorldRenderer:
         element_screen_data = (element_sx, element_sy, element_scale)
 
         #Bloque para las sombras
-        if plane_surface_z < element_z and self.element_surface is not None: #Si hay una superficie receptora guardada, recortamos las sombras
+        if plane_surface_z < element_z and self.element_surface is not None and has_shadow == True: #Si hay una superficie receptora guardada, recortamos las sombras
             shadow_sx = element_sx
             delta_sy = element_scale * (element_z - plane_surface_z) 
             shadow_sy = element_sy + delta_sy  #igual matematicamente a: shadow_sx, shadow_sy, _ = Pseudo3D.world_to_screen(element_x, element_y, plane_surface_z)

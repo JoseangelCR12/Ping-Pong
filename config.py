@@ -27,8 +27,8 @@ Y_MAX = OPPONENT_SIDE_Y + PLAYER_SIDE_Y #Profundidad maxima de las raquetas en e
 
 #Medidas de la malla
 HALF_NET_THICKNESS = 4 #Grosor de la malla en Y
-HALF_NET_WIDTH = HALF_TABLE_WIDTH + 15
-NET_HEIGHT = 16
+HALF_NET_WIDTH = HALF_TABLE_WIDTH + 24
+NET_HEIGHT = 25
 
 #Las dimensiones de las raquetas en el espacio 3D
 PADDLE_THICKNESS = 8

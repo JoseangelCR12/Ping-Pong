@@ -1,13 +1,13 @@
 {
-    "volume_music": 1.0,
-    "volume_sfx": 0.8125,
+    "volume_music": 0.0,
+    "volume_sfx": 1.0,
     "wheel_sensitivity": 20,
-    "theme": "purple",
-    "camera_mode": "standard",
+    "theme": "udo",
+    "camera_mode": "fisheye",
     "cpu_level": 3,
-    "horizon_line": -15,
-    "camera_depth": -180,
-    "camera_height": 304,
-    "focal_length": 456,
-    "k_padding": 228
+    "horizon_line": 90,
+    "camera_depth": -550,
+    "camera_height": 120,
+    "focal_length": 200,
+    "k_padding": -400
 }

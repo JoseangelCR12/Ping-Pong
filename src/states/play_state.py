@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from ..entities import *
 
 class PlayState(BaseState):
-    def __init__(self, resource_manager, audio: "Audio", renderer: "Renderer", physics: "Physics", world_renderer: "WorldRenderer", Paddle: type["Paddle"], Ball: type["Ball"], Table: type["Table"]):
+    def __init__(self, resource_manager, audio: "Audio", renderer: "Renderer", physics: "Physics", world_renderer: "WorldRenderer", Paddle: type["Paddle"], Ball: type["Ball"], Table: type["Table"], Net: type["Net"]):
         super().__init__(resource_manager)
         self.audio = audio
         self.renderer = renderer
@@ -18,6 +18,7 @@ class PlayState(BaseState):
         self.player_paddle = Paddle(0, 0)
         self.ball = Ball(0, config.PLAYER_SIDE_Y - 20)
         self.table = Table(0, config.NET_Y, config.Z_TABLE)
+        self.net = Net(0, config.NET_Y, config.Z_TABLE) 
 
         self.state_name = "PLAY"
 
@@ -42,6 +43,8 @@ class PlayState(BaseState):
         self.floor_texture = self.resource_manager.get_texture(self.state_name, "floor")
         self.table_texture = self.resource_manager.get_texture(self.state_name, "table")
         self.table_edge = self.resource_manager.get_texture(self.state_name, "table_edge")
+        self.net_texture = self.resource_manager.get_texture(self.state_name, "net")
+        self.net_bottom = self.resource_manager.get_texture(self.state_name, "net_bottom")
         #creamos la surface de la sombra de la mesa a partir del sprite original
         color = (0, 0, 0) #Color negro, la transparecia se le coloca la superficie final escalada con perspectiva
         self.shadow_table = self.table_texture.copy() #Para no modificar el surface original
@@ -108,7 +111,22 @@ class PlayState(BaseState):
         self.world_renderer.add_xz_element(
             self.table.x, config.PLAYER_SIDE_Y, self.table.z - 6, 
             self.state_name, "table_edge", self.table.z, self.table.y - self.table.half_length,
-            1, 16, False, surface=self.table_edge
+            1, 16, False, surface=self.table_edge, has_shadow=False
+            )
+        
+        #La malla, la cual esta dividida en dos sprites, el sprite de lo que esta por encima de la mesa, y el sprite de los soportes que van por debajo
+        self.world_renderer.add_xz_element(
+            self.net.x, self.net.y, self.net.z + 14, 
+            self.state_name, "net", self.table.z,
+            self.table.y - self.table.half_length,
+            2, 28, False, surface=self.net_texture, has_shadow=False
+            )
+        
+        self.world_renderer.add_xz_element(
+            self.net.x, self.net.y, self.net.z - 2, 
+            self.state_name, "net_bottom", self.table.z,
+            self.table.y - self.table.half_length,
+            2, 5, False, surface=self.net_bottom, has_shadow=False
             )
         
         #Las raquetas que se actualizan constantemente

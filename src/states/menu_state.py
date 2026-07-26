@@ -21,7 +21,7 @@ class MenuState(BaseState):
         py.mouse.set_visible(True) # Mouse visible
 
         #Cargamos la ui y guardamos los subdiccionarios de elementos
-        self.ui_elements = load_ui("MENU", self.resource_manager)
+        self.ui_elements = load_ui("MENU", self.resource_manager, self.audio)
         self.buttons = self.ui_elements["buttons"]
         self.icons = self.ui_elements["icons"]
 

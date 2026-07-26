@@ -1,7 +1,7 @@
 import pygame as py
 
 class Button:
-    def __init__(self, position_type: str, offset_x: int, offset_y: int, image_normal: py.Surface, image_hover: py.Surface):
+    def __init__(self, position_type: str, offset_x: int, offset_y: int, image_normal: py.Surface, image_hover: py.Surface, on_click=None):
 
         self.image_normal = image_normal
         self.image_hover = image_hover
@@ -17,6 +17,9 @@ class Button:
         self.rect = self.image.get_rect()
         self.is_positioned = False
         self.is_hovered = False
+
+        #Se almacena la funcion que reproduce sonido al hacer click
+        self.on_click = on_click
 
     def _calculate_position(self, screen: py.Surface):
         screen_rect = screen.get_rect()
@@ -46,6 +49,8 @@ class Button:
 
         if event.type == py.MOUSEBUTTONDOWN and event.button == py.BUTTON_LEFT:
             if self.rect.collidepoint(event.pos):
+                if self.on_click:
+                    self.on_click() 
                 return True
         return False
 

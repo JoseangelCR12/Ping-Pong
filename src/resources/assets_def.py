@@ -3,8 +3,12 @@ GLOBAL = {
     },
     "music": {
     },
-    "font":{
+    "font": {
         "main_font": "assets/font/Retro Gaming.ttf"
+    },
+    "sound": {
+        "click_sound": "assets/audio/click_button.ogg",
+        "slider_sound": "assets/audio/slider_click.ogg"
     }
     }
 
@@ -28,7 +32,9 @@ PLAY = {
         "floor": "assets/background/{theme}/floor.png",
         "table": "assets/entities/{theme}/table.png",
         "table_edge": "assets/entities/{theme}/table_edge.png",
-        "ball": "assets/entities/ball.png"
+        "ball": "assets/entities/ball.png",
+        "net": "assets/entities/{theme}/net.png",
+        "net_bottom": "assets/entities/{theme}/net_bottom.png"
     },
     "spritesheets": {
         "paddle": "assets/entities/{theme}/paddle.png"        
@@ -47,7 +53,10 @@ OPTIONS = {
         "slider_bar_e": "assets/ui/sliders/slider_bar_e.png",
         "slider_bar_f": "assets/ui/sliders/slider_bar_f.png",
         "slider_btn": "assets/ui/{theme}/buttons/slider_btn.png",
-        "slider_btn_h": "assets/ui/{theme}/buttons/slider_btn_h.png"
+        "slider_btn_h": "assets/ui/{theme}/buttons/slider_btn_h.png",
+        "music_icon": "assets/ui/icons/music_icon.png",
+        "sound_icon": "assets/ui/icons/sound_icon.png",
+        "w_sensitivity_icon": "assets/ui/{theme}/icons/w_sensitivity_icon.png"
     },
     "sound": {},
     "music": {
@@ -59,12 +68,17 @@ OPTIONS = {
 PAUSE = {
     "sprites": {
         "underlay": "assets/ui/{theme}/icons/underlay.png",
-        "btn_theme": "assets/ui/{theme}/buttons/btn_theme.png", 
-        "btn_theme_h": "assets/ui/{theme}/buttons/btn_theme_h.png",
+        "btn_home": "assets/ui/{theme}/buttons/btn_home.png", 
+        "btn_home_h": "assets/ui/{theme}/buttons/btn_home_h.png",
+        "btn_restart": "assets/ui/{theme}/buttons/btn_restart.png", 
+        "btn_restart_h": "assets/ui/{theme}/buttons/btn_restart_h.png",
         "slider_bar_e": "assets/ui/sliders/slider_bar_e.png",
         "slider_bar_f": "assets/ui/sliders/slider_bar_f.png",
         "slider_btn": "assets/ui/{theme}/buttons/slider_btn.png",
-        "slider_btn_h": "assets/ui/{theme}/buttons/slider_btn_h.png"
+        "slider_btn_h": "assets/ui/{theme}/buttons/slider_btn_h.png",
+        "music_icon": "assets/ui/icons/music_icon.png",
+        "sound_icon": "assets/ui/icons/sound_icon.png",
+        "w_sensitivity_icon": "assets/ui/{theme}/icons/w_sensitivity_icon.png"
     },
     "sound": {},
     "music": {

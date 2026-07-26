@@ -2,7 +2,7 @@ from ..states import *
 
 STATE_ROUTES = {
     "MENU": (MenuState, ["resource_manager", "audio"]),
-    "PLAY": (PlayState, ["resource_manager", "audio", "renderer", "physics", "world_renderer", "Paddle", "Ball", "Table"]),
+    "PLAY": (PlayState, ["resource_manager", "audio", "renderer", "physics", "world_renderer", "Paddle", "Ball", "Table", "Net"]),
     "PAUSE": (PauseState, ["resource_manager", "audio", "renderer"]),
     "OPTIONS": (OptionsState, ["resource_manager", "audio", "renderer"]),
     "SELECTION": (SelectionState, ["resource_manager", "audio", "renderer"]),

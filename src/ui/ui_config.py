@@ -39,22 +39,34 @@ OPTIONS = {
             {
                 "name": "menu_underlay", "position": "center", "offset_x": 0, "offset_y": 0,
                 "texture": "underlay"
+            },
+            {
+                "name": "music_icon", "position": "center", "offset_x": -145, "offset_y": -85,
+                "texture": "music_icon"
+            },
+            {
+                "name": "sound_icon", "position": "center", "offset_x": -145, "offset_y": -45,
+                "texture": "sound_icon"
+            },
+            {
+                "name": "w_sensitivity_icon", "position": "center", "offset_x": -145, "offset_y": -5,
+                "texture": "w_sensitivity_icon"
             }
         ],
 
         "sliders": [
             {
-                "name": "volume_music", "position": "center", "offset_x": 30, "offset_y": -75,
+                "name": "volume_music", "position": "center", "offset_x": 30, "offset_y": -85,
                 "min_value": 0.0, "max_value": 1.0, "init_value": 0.7,
                 "textures": ["slider_bar_e", "slider_bar_f", "slider_btn", "slider_btn_h"]
             },
             {
-                "name": "volume_sfx", "position": "center", "offset_x": 30, "offset_y": -38,
+                "name": "volume_sfx", "position": "center", "offset_x": 30, "offset_y": -45,
                 "min_value": 0.0, "max_value": 1.0, "init_value": 0.7,
                 "textures": ["slider_bar_e", "slider_bar_f", "slider_btn", "slider_btn_h"]
             }, 
             {
-                "name": "wheel_sensitivity", "position": "center", "offset_x": 30, "offset_y": -2,
+                "name": "wheel_sensitivity", "position": "center", "offset_x": 30, "offset_y": -5,
                 "min_value": 2, "max_value": 20, "init_value": 15,
                 "textures": ["slider_bar_e", "slider_bar_f", "slider_btn", "slider_btn_h"]
             }
@@ -65,11 +77,11 @@ PAUSE = {
         "buttons": [
             {
                 "name": "menu", "position": "center", "offset_x": -100, "offset_y": 62,
-                "textures": ["btn_theme", "btn_theme_h"]
+                "textures": ["btn_home", "btn_home_h"]
             },
             {
                 "name": "restart", "position": "center", "offset_x": 100, "offset_y": 62,
-                "textures": ["btn_theme", "btn_theme_h"]
+                "textures": ["btn_restart", "btn_restart_h"]
             }
             
         ],
@@ -78,22 +90,34 @@ PAUSE = {
             {
                 "name": "underlay", "position": "center", "offset_x": 0, "offset_y": 0,
                 "texture": "underlay"
+            },
+            {
+                "name": "music_icon", "position": "center", "offset_x": -145, "offset_y": -85,
+                "texture": "music_icon"
+            },
+            {
+                "name": "sound_icon", "position": "center", "offset_x": -145, "offset_y": -45,
+                "texture": "sound_icon"
+            },
+            {
+                "name": "w_sensitivity_icon", "position": "center", "offset_x": -145, "offset_y": -5,
+                "texture": "w_sensitivity_icon"
             }
         ],
 
         "sliders": [
             {
-                "name": "volume_music", "position": "center", "offset_x": 30, "offset_y": -75,
+                "name": "volume_music", "position": "center", "offset_x": 30, "offset_y": -85,
                 "min_value": 0.0, "max_value": 1.0, "init_value": 0.7,
                 "textures": ["slider_bar_e", "slider_bar_f", "slider_btn", "slider_btn_h"]
             },
             {
-                "name": "volume_sfx", "position": "center", "offset_x": 30, "offset_y": -35,
+                "name": "volume_sfx", "position": "center", "offset_x": 30, "offset_y": -45,
                 "min_value": 0.0, "max_value": 1.0, "init_value": 0.7,
                 "textures": ["slider_bar_e", "slider_bar_f", "slider_btn", "slider_btn_h"]
             }, 
             {
-                "name": "wheel_sensitivity", "position": "center", "offset_x": 30, "offset_y": 5,
+                "name": "wheel_sensitivity", "position": "center", "offset_x": 30, "offset_y": -5,
                 "min_value": 2, "max_value": 20, "init_value": 15,
                 "textures": ["slider_bar_e", "slider_bar_f", "slider_btn", "slider_btn_h"]
             }
