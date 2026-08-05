@@ -104,6 +104,7 @@ class Physics:
         if math.dist((ball.x, ball.y, ball.z), (paddle.x, paddle.y, paddle.z)) > 25:
             return False
 
+
         #Donde estaba la raqueta en el frame anterior
         prev_min_x = cur_min_x - paddle.vx
         prev_max_x = cur_max_x - paddle.vx

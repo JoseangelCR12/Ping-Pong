@@ -125,7 +125,7 @@ class PlayState(BaseState):
                 self.game_rules.register_paddle_hit("PLAYER")
             
            
-            if self.Physics.check_paddle_collision(self.ball, self.player_paddle, dt): #verificamos colision con la raqueta del jugador
+            if self.Physics.check_paddle_collision(self.ball, self.cpu_paddle, dt): #verificamos colision con la raqueta de la cpu
                 self.audio.play_sound(self.state_name, "paddle_hit")
                 self.game_rules.register_paddle_hit("CPU")
             
