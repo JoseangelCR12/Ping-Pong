@@ -22,6 +22,21 @@ MENU = {
             }
         ]
 }
+
+PLAY = { 
+        
+        "texts": [
+            {
+                "name": "cpu_score", "position": "center", "offset_x": -280, "offset_y": -60,
+                "message": "CPU", "size": 32, "color": (20, 20 ,142), "font": "main_font", "antialias": True
+            },
+            {
+                "name": "player_score", "position": "center", "offset_x": 290, "offset_y": -60,
+                "message": "TÚ", "size": 32, "color": (142, 20 ,20), "font": "main_font", "antialias": True
+            }
+        ]
+}
+
 OPTIONS = { 
         "buttons": [
             {

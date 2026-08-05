@@ -27,10 +27,10 @@ class Paddle:
         self.delta_twiddle = 0
 
     def get_limits(self):
-        """Retorna los limites de la raqueta en el frame actual (min_x, max_x, min_y, max_y, min_z, max_z), además de el angulo de rotacion de la raqueta"""
+        """Retorna los limites de la raqueta en el frame actual (min_x, max_x, min_y, max_y, min_z, max_z)"""
         return (self.x - self.width // 2, self.x + self.width // 2,
                 self.y - self.thickness // 2, self.y + self.thickness // 2,
-                self.z - self.height // 2, self.z + self.height // 2, self.angle)
+                self.z - self.height // 2, self.z + self.height // 2)
 
             
     def mouse_to_world(self, mouse_sx: int, mouse_sy: int, z_delta: int, dt):

@@ -7,6 +7,8 @@ class GameRules:
         self.is_service = True
         self.last_hit_by = initial_server
         self.total_services_done = 0
+        self.waiting_for_serve = True
+        self.is_tossed = False
 
         #Banderas de rebotes
         self.server_side_bounced = False
@@ -19,6 +21,14 @@ class GameRules:
         self.cpu_score = 0
         self.match_over = False
         self.winner = None
+
+    def toss_ball(self):
+        """Metodo que se llama cuando se realiza un saque"""
+        if self.waiting_for_serve and not self.is_tossed:
+            self.is_tossed = True
+            self.waiting_for_serve = False
+            return True
+        return False
 
     def evaluate_frame(self, hit_table, hit_floor, hit_net, ball_y):
         """

@@ -98,7 +98,7 @@ class Physics:
     @staticmethod
     def check_paddle_collision(ball, paddle, dt):
         """Verifica la colisión tridimensional reactiva entre la pelota y cualquier raqueta"""
-        cur_min_x, cur_max_x, cur_min_y, cur_max_y, cur_min_z, cur_max_z, angle = paddle.get_limits()
+        cur_min_x, cur_max_x, cur_min_y, cur_max_y, cur_min_z, cur_max_z = paddle.get_limits()
         
         #Si la distancia real entre la pelota y la raqueta es muy grande, volvemos
         if math.dist((ball.x, ball.y, ball.z), (paddle.x, paddle.y, paddle.z)) > 25:
