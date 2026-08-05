@@ -2,120 +2,111 @@ import math
 import config
 
 class CPUBrain:
+    has_hit_ball = False
+    has_bounced = False  # Bandera para registrar el pique en el campo de la CPU
+
     @staticmethod
     def calculate_and_move(cpu_paddle, ball, table_limits, dt):
         """
-        Cerebro matemático de la IA. Predice la física completa de la pelota,
-        incluyendo el rebote en la mesa y la parábola ascendente posterior,
-        para interceptarla en el aire de forma precisa.
+        Cerebro de la IA con espera estricta de rebote:
+        - Detecta cuándo la pelota toca la mesa de la CPU.
+        - Mantiene la raqueta en posición de espera hasta que la pelota pica.
+        - Solo tras el rebote inicia el swing y devuelve con fuerza controlada.
         """
         min_table_x, max_table_x, min_table_y, max_table_y, min_table_z, _ = table_limits
-        
-        # Comportamiento de repliegue defensivo cuando la pelota se aleja hacia el jugador
-        if ball.vy <= 0:
+
+        # --- 1. RESET DE ESTADO (Cuando la pelota vuelve al campo del jugador) ---
+        if ball.y <= config.NET_Y or ball.vy < -20.0:
+            CPUBrain.has_hit_ball = False
+            CPUBrain.has_bounced = False
+
+        # --- 2. RETIRADA POST-GOLPE O PELOTA EN VIAJE AL JUGADOR ---
+        if CPUBrain.has_hit_ball or ball.vy <= 0:
             target_x = 0
-            target_y = config.DEFAULT_CPU_CENTER_Y  
-            target_z = config.DEFAULT_CPU_CENTER_Z
-            CPUBrain._smooth_move(cpu_paddle, target_x, target_y, target_z, dt)
-            return
-
-        # --- SIMULACIÓN DE TRAYECTORIA PRE-REBOTE ---
-        sim_x = ball.x
-        sim_y = ball.y
-        sim_z = ball.z
-        sim_vx = ball.vx
-        sim_vy = ball.vy
-        sim_vz = ball.vz
-
-        sim_dt = 1.0 / 60.0
-        gravity_step = config.GRAVITY * sim_dt
-
-        rebounded_on_table = False
-        time_to_bounce = 0.0
-
-        # Buscamos el momento exacto en el que la pelota golpea la mesa
-        while sim_vy > 0 and sim_y < config.OPPONENT_SIDE_Y and sim_z > min_table_z:
-            sim_vx *= config.FRICTION
-            sim_vy *= config.FRICTION
-            sim_vz -= gravity_step
-
-            sim_x += sim_vx * sim_dt
-            sim_y += sim_vy * sim_dt
-            sim_z += sim_vz * sim_dt
-            time_to_bounce += sim_dt
-
-            # Detectamos si la pelota cruza el plano Z de la mesa (Z = min_table_z)
-            if sim_z <= min_table_z:
-                if min_table_x <= sim_x <= max_table_x and min_table_y <= sim_y <= max_table_y:
-                    sim_z = min_table_z
-                    sim_vz = -sim_vz * ball.restitution
-                    rebounded_on_table = True
-                break
-
-        # --- EVALUACIÓN DE ESTRATEGIA ---
-        # Si no se detecta un rebote válido en la mesa, la pelota va fuera y nos apartamos
-        if not rebounded_on_table:
-            target_x = max_table_x + 30 if sim_x < (min_table_x + max_table_x)/2 else min_table_x - 30
             target_y = config.DEFAULT_CPU_CENTER_Y
             target_z = config.DEFAULT_CPU_CENTER_Z
-            CPUBrain._smooth_move(cpu_paddle, target_x, target_y, target_z, dt)
+            CPUBrain._smooth_move(cpu_paddle, target_x, target_y, target_z, dt, force_speed=config.CPU_MOVE_SPEED)
             return
 
-        # --- SIMULACIÓN POST-REBOTE (INTERCEPCIÓN REAL) ---
-        # Ahora que sabemos que rebotó, simulamos unos cuantos frames más hacia el futuro 
-        # (por ejemplo, 10 frames tras el impacto) para buscarla en su fase ascendente ideal.
-        frames_after_bounce = 10
-        
-        for _ in range(frames_after_bounce):
-            sim_vx *= config.FRICTION
-            sim_vy *= config.FRICTION
-            sim_vz -= gravity_step
+        paddle_depth = getattr(cpu_paddle, 'depth', 6.0)
+        ball_radius = getattr(ball, 'radius', 5.0)
 
-            sim_x += sim_vx * sim_dt
-            sim_y += sim_vy * sim_dt
-            sim_z += sim_vz * sim_dt
+        # --- 3. DETECCIÓN REAL DEL REBOTE EN EL LADO DE LA CPU ---
+        # Si la pelota está en el lado de la CPU (y > NET_Y) y...
+        # A) Su velocidad vertical es positiva (está rebotando hacia arriba después del impacto)
+        # B) O la pelota está rozando la altura de la mesa (z <= min_table_z + ball_radius + 3.0)
+        if ball.y > config.NET_Y:
+            if ball.vz > 5.0 or ball.z <= (min_table_z + ball_radius + 3.0):
+                CPUBrain.has_bounced = True
 
-        # Las coordenadas de intercepción calculadas tras la parábola del rebote
-        target_x = sim_x
-        target_y = sim_y
-        target_z = sim_z
+        dist_x = abs(cpu_paddle.x - ball.x)
+        dist_y = cpu_paddle.y - ball.y
+        dist_z = abs(cpu_paddle.z - ball.z)
 
-        # Ajuste de las posiciones ideales dentro de los límites de movimiento de la CPU
-        target_x = max(min_table_x - 10, min(target_x, max_table_x + 10))
-        target_y = max(config.NET_Y, min(target_y, config.OPPONENT_SIDE_Y))
-        target_z = max(min_table_z + 10, min(target_z, config.MAX_PADDLE_Z)) # Asegurar altura de golpeo cómoda
+        # --- 4. CONTACTO Y DEVOLUCIÓN (SOLO TRAS EL REBOTE) ---
+        step_y = max(8.0, ball.vy * dt)
+        HIT_BOX_Y = paddle_depth + ball_radius + step_y + 4.0
 
-        # pasamos el mov publico al paddle
-        CPUBrain._smooth_move(cpu_paddle, target_x, target_y, target_z, dt)
+        if CPUBrain.has_bounced and dist_y <= HIT_BOX_Y and dist_y >= -10.0 and dist_x < 50.0 and dist_z < 50.0:
+            CPUBrain.has_hit_ball = True
+
+            # Potencia calibrada (entre 480 y 550)
+            RETURN_POWER = max(480.0, abs(ball.vy) * 1.25)
+            ball.vy = -RETURN_POWER
+
+            # Dirección horizontal
+            ball.vx = (-ball.x * 0.5 - ball.x) * 1.1
+
+            # Parábola de retorno
+            if ball.z > (min_table_z + 30.0):
+                ball.vz = -50.0   # Remate suave si subió mucho
+            else:
+                ball.vz = 85.0    # Arco para pasar la red
+
+            # Desacoplamiento físico
+            ball.y = cpu_paddle.y - (paddle_depth + ball_radius + 6.0)
+            return
+
+        # --- 5. COMPORTAMIENTO DE ESPERA VS EMBESTIDA ---
+        target_x = ball.x
+        target_z = max(min_table_z + ball_radius + 6.0, ball.z)
+
+        if CPUBrain.has_bounced:
+            # ¡Ya picó! La raqueta embiste hacia adelante para pegarle
+            target_y = ball.y - 20.0
+            EMBESTIDA_SPEED = max(config.CPU_MOVE_SPEED * 5.0, abs(ball.vy) * 3.0)
+        else:
+            # Aún no pica: La raqueta espera pacientemente al fondo de su mesa
+            target_y = config.OPPONENT_SIDE_Y + 40.0
+            EMBESTIDA_SPEED = max(config.CPU_MOVE_SPEED * 2.0, abs(ball.vy) * 1.2)
+
+        # Límites de seguridad
+        NET_SAFETY_MARGIN_Y = 10.0
+        min_cpu_y = config.NET_Y + NET_SAFETY_MARGIN_Y
+
+        target_x = max(min_table_x - 10.0, min(target_x, max_table_x + 10.0))
+        target_y = max(min_cpu_y, min(target_y, config.OPPONENT_SIDE_Y + 70.0))
+        target_z = max(min_table_z + ball_radius + 6.0, min(target_z, config.MAX_PADDLE_Z))
+
+        CPUBrain._smooth_move(cpu_paddle, target_x, target_y, target_z, dt, force_speed=EMBESTIDA_SPEED)
 
     @staticmethod
-    def _smooth_move(paddle, target_x, target_y, target_z, dt):
-        """
-        Interpola el movimiento en X, Y y Z usando la velocidad máxima de la CPU,
-        lo que genera velocidades vx, vy, vz reales en la raqueta al desplazarse.
-        """
-        cpu_speed = config.CPU_MOVE_SPEED * dt
+    def _smooth_move(paddle, target_x, target_y, target_z, dt, force_speed):
+        step = force_speed * dt
 
-        if paddle.x < target_x:
-            new_x = min(paddle.x + cpu_speed, target_x)
-        elif paddle.x > target_x:
-            new_x = max(paddle.x - cpu_speed, target_x)
+        if abs(target_x - paddle.x) <= step:
+            new_x = target_x
         else:
-            new_x = paddle.x
+            new_x = paddle.x + math.copysign(step, target_x - paddle.x)
 
-        if paddle.y < target_y:
-            new_y = min(paddle.y + cpu_speed, target_y)
-        elif paddle.y > target_y:
-            new_y = max(paddle.y - cpu_speed, target_y)
+        if abs(target_y - paddle.y) <= step:
+            new_y = target_y
         else:
-            new_y = paddle.y
+            new_y = paddle.y + math.copysign(step, target_y - paddle.y)
 
-        if paddle.z < target_z:
-            new_z = min(paddle.z + cpu_speed, target_z)
-        elif paddle.z > target_z:
-            new_z = max(paddle.z - cpu_speed, target_z)
+        if abs(target_z - paddle.z) <= step:
+            new_z = target_z
         else:
-            new_z = paddle.z
+            new_z = paddle.z + math.copysign(step, target_z - paddle.z)
 
-        # pasamos el mov publico al paddle
         paddle.update_pos(new_x, new_y, new_z, dt=dt)

@@ -19,7 +19,7 @@ if __name__ == "__main__":
     #REVISA LO QUE VA CAMBIANDO DIEGO Y COMPAGINEN BIEN LOS CAMBIOS Y LAS FISICAS
 
 
-    #TErmnia lo visual de menus y eso, te faltan unos sprites, unos background y listo
+    #Termina lo visual de menus y eso, te faltan unos sprites, unos background y listo
 
     #Integren fisican, hagan gamerules y arregles las cpus, y habran terminado, USTEDES PUEDEN
     #ah, y hagan los creditos
