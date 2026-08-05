@@ -53,6 +53,13 @@ class Paddle:
     def update_pos(self, target_x, target_y, target_z, dt):
         """Actualiza la posicion de la raqueta en el espacio 3D, limitando la altura y calculando el angulo de rotacion en X"""
         self._angle_x(target_x)
+
+        #Guardamos lo viejo
+        self.last_x = self.x
+        self.last_y = self.y
+        self.last_z = self.z
+
+        #actualizamos lo nuevo
         self.x = target_x
         self.y = target_y
 
@@ -64,13 +71,14 @@ class Paddle:
     
 
     def get_restitution(self):
-        """Retorna la restitución elástica activa según la cara de la raqueta (Responsabilidad Única)"""
-        if self.twiddle:
-            return config.PADDLE_RESTITUTION  # Goma cara A
-        return config.PADDLE_BACK_RESTITUTION # Goma cara B (Revés)
+        """Retorna la restitución elástica activa según la cara de la raqueta, junto con la que queda del lado contrario"""
+        if not self.twiddle:
+            return config.PADDLE_RESTITUTION, config.PADDLE_BACK_RESTITUTION  # Goma cara A, luego B
+        return config.PADDLE_BACK_RESTITUTION, config.PADDLE_RESTITUTION # Goma cara B (Revés), luego A
 
     def _calculate_vel(self, dt):
         #calcula la velocidad de la raqueta en cada frame
+        #Como se calcula cada frame, el resultado de la diferencia es la velocidad por frame
         if dt > 0:
             self.vx = (self.x - self.last_x) / dt
             self.vy = (self.y - self.last_y) / dt

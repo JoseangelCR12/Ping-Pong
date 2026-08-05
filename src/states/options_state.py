@@ -33,10 +33,6 @@ class OptionsState(BaseState):
         self.themes = ["classic", "udo", "purple"]
         self.cameras = ["standard", "fisheye"]
 
-        #
-        self.audio.play_music("OPTIONS", "dopodime")
-        #
-
     def handle_input(self, events : list[py.event.Event]) -> None:
         for event in events:
             if event.type == py.KEYDOWN:

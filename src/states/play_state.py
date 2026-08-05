@@ -9,11 +9,13 @@ if TYPE_CHECKING:
     from ..entities import *
 
 class PlayState(BaseState):
-    def __init__(self, resource_manager, audio: "Audio", renderer: "Renderer", physics: "Physics", world_renderer: "WorldRenderer", Paddle: type["Paddle"], Ball: type["Ball"], Table: type["Table"], Net: type["Net"]):
+    def __init__(self, resource_manager, audio: "Audio", renderer: "Renderer", world_renderer: "WorldRenderer", Physics: type["Physics"], GameRules: type["GameRules"], CPUBrain: type["CPUBrain"], Paddle: type["Paddle"], Ball: type["Ball"], Table: type["Table"], Net: type["Net"]):
         super().__init__(resource_manager)
         self.audio = audio
         self.renderer = renderer
-        self.physics = physics
+        self.Physics = Physics
+        self.game_rules = GameRules()
+        self.CPUBrain = CPUBrain
         self.world_renderer = world_renderer
         self.player_paddle = Paddle(0, 0)
         self.ball = Ball(0, config.PLAYER_SIDE_Y - 20)
@@ -23,7 +25,7 @@ class PlayState(BaseState):
         self.state_name = "PLAY"
 
         ##
-        self.test_paddle = Paddle(0, config.Y_MAX)
+        self.cpu_paddle = Paddle(0, config.Y_MAX)
         ##
 
 
@@ -45,6 +47,8 @@ class PlayState(BaseState):
         self.table_edge = self.resource_manager.get_texture(self.state_name, "table_edge")
         self.net_texture = self.resource_manager.get_texture(self.state_name, "net")
         self.net_bottom = self.resource_manager.get_texture(self.state_name, "net_bottom")
+        self.ball_texture = self.resource_manager.get_texture(self.state_name, "ball")
+
         #creamos la surface de la sombra de la mesa a partir del sprite original
         color = (0, 0, 0) #Color negro, la transparecia se le coloca la superficie final escalada con perspectiva
         self.shadow_table = self.table_texture.copy() #Para no modificar el surface original
@@ -68,11 +72,20 @@ class PlayState(BaseState):
             if event.type == py.KEYDOWN:
                 if event.key == py.K_ESCAPE:
                     self.next_push_state = "PAUSE"
+
+                ## PARA TESTEO, RESPAWNEA PELOTA
+                if event.key == py.K_SPACE:
+                    self.ball.update_pos(0, config.PLAYER_SIDE_Y + 20, config.Z_TABLE + 50)
+                    self.ball.vx = 0.0
+                    self.ball.vy = 0.0
+                    self.ball.vz = 0.0
+
+                ##
             
             elif event.type == py.MOUSEBUTTONDOWN:
                 if event.button == py.BUTTON_WHEELUP: wheel_z_change = data.get("wheel_sensitivity", 15)
                 if event.button == py.BUTTON_WHEELDOWN: wheel_z_change = -data.get("wheel_sensitivity", 15)
-                if event.button == py.BUTTON_RIGHT: self.player_paddle.twiddle, self.test_paddle.twiddle = not self.player_paddle.twiddle, not self.test_paddle.twiddle
+                if event.button == py.BUTTON_RIGHT: self.player_paddle.twiddle = not self.player_paddle.twiddle
         self.target_z_change = wheel_z_change
 
         #Inputs continuos (como el mouse)
@@ -86,9 +99,42 @@ class PlayState(BaseState):
         self.player_paddle.mouse_to_world(self.mouse_x, self.mouse_y, self.target_z_change, dt)
 
         ###
-        self.test_paddle.update_pos(self.player_paddle.x, config.Y_MAX - self.player_paddle.y , self.player_paddle.z, dt)
+        self.CPUBrain.calculate_and_move(self.cpu_paddle, self.ball, self.table.get_limits(), dt)
         ###
+
+        #Actualizamos las fisicas
+        self.Physics.move_ball(self.ball, dt) #actualizamos la pelota
+
+        if self.Physics.check_paddle_collision(self.ball, self.player_paddle, dt): #verificamos colision con la raqueta del jugador
+            self.audio.play_sound(self.state_name, "paddle_hit")
+            self.game_rules.register_paddle_hit("PLAYER")
+
+            #
+            print(f"ball.vy={self.ball.vy:.2f} ball.vx={self.ball.vx:.2f} ball.vz={self.ball.vz:.2f}")
+            print(f"player_paddle.vy={self.player_paddle.vy:.2f} player_paddle.vx={self.player_paddle.vx:.2f} player_paddle.vz={self.player_paddle.vz:.2f}") 
+        
+        if self.Physics.check_paddle_collision(self.ball, self.player_paddle, dt): #verificamos colision con la raqueta del jugador
+            self.audio.play_sound(self.state_name, "paddle_hit")
+            self.game_rules.register_paddle_hit("CPU")
             
+
+            #Verficamos colisiones con otros elementos
+        hit_table = self.Physics.check_surface_collision(self.ball, self.table.get_limits())
+        hit_floor = self.Physics.check_floor_collision(self.ball)
+        hit_net = self.Physics.check_net_collision(self.ball, self.net.get_limits())
+
+        #Ahora verificamos el partido con el modulo de reglas (arbitro)
+        result = self.game_rules.evaluate_frame(hit_table, hit_floor, hit_net, self.ball.y)
+        
+        ##TEMPORAL
+        if result == "POINT":
+            print("POINT")
+        elif result == "LET":
+            print("LET")
+        elif result == "MATCH_OVER":
+            print("MATCH OVER")
+           
+
     def render(self, screen: py.Surface) -> None:
         
         #Limpiamos la cola de elementos en pantalla cada frame
@@ -131,10 +177,10 @@ class PlayState(BaseState):
         
         #Las raquetas que se actualizan constantemente
         self.world_renderer.add_xz_element(
-            self.test_paddle.x, self.test_paddle.y, self.test_paddle.z,
+            self.cpu_paddle.x, self.cpu_paddle.y, self.cpu_paddle.z,
             self.state_name, "paddle", self.table.z, self.table.y - self.table.half_length, 
-            self.test_paddle.thickness, self.test_paddle.height, True, -self.test_paddle.angle, 
-            None, self.test_paddle.width
+            self.cpu_paddle.thickness, self.cpu_paddle.height, True, -self.cpu_paddle.angle, 
+            None, self.cpu_paddle.width
             )
 
         self.world_renderer.add_xz_element(
@@ -144,6 +190,14 @@ class PlayState(BaseState):
             None, self.player_paddle.width
             )
         
+        #La pelota que se actualiza constantemente
+        self.world_renderer.add_xz_element(
+            self.ball.x, self.ball.y, self.ball.z,
+            self.state_name, "ball", self.table.z, self.table.y - self.table.half_length,
+            self.ball.radius * 3, self.ball.radius, False, 0,
+            None, self.ball.radius * 3
+        )
+
         #Renderizamos el mundo pseudo3D
         self.world_renderer.render_world()
 

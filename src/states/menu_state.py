@@ -32,7 +32,7 @@ class MenuState(BaseState):
             elif self.buttons["options"].handle_input(event):
                 self.next_push_state = "OPTIONS"
             elif self.buttons["credits"].handle_input(event):
-                pass
+                self.next_change_state = "CREDITS"
     
     def update(self, dt: float) -> None:
         mouse_pos = py.mouse.get_pos()

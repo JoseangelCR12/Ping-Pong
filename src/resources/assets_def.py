@@ -1,5 +1,6 @@
 GLOBAL = {
     "sprites": {
+        "logo": "assets/ui/{theme}/icons/logo.png"
     },
     "music": {
     },
@@ -14,7 +15,6 @@ GLOBAL = {
 
 MENU = {
     "sprites": {
-        "logo": "assets/ui/{theme}/icons/logo.png",
         "btn_play": "assets/ui/{theme}/buttons/btn_play.png", 
         "btn_play_h": "assets/ui/{theme}/buttons/btn_play_h.png",
         "btn_credits": "assets/ui/{theme}/buttons/btn_credits.png", 

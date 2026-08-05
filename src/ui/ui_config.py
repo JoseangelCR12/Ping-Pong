@@ -166,3 +166,53 @@ SELECTION = {
             }
         ]
 }
+
+CREDITS = { 
+        
+        "icons": [
+            {
+                "name": "game_logo", "position": "top_center", "offset_x": 0, "offset_y": 0,
+                "texture": "logo"
+            }
+        ],
+
+        "texts": [
+            {
+                "name": "line_1", "position": "center", "offset_x": 0, "offset_y": -60,
+                "message": "Un juego creado por:", "size": 12, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "line_2", "position": "center", "offset_x": 0, "offset_y": -40,
+                "message": "Joseangel Cardenas y Diego Velásquez", "size": 12, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "line_3", "position": "center", "offset_x": 0, "offset_y": -20,
+                "message": "Arte original creado en LibreSprite", "size": 12, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "line_4", "position": "center", "offset_x": 0, "offset_y": 20,
+                "message": "Música de Darnu-Pop", "size": 12, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "line_5", "position": "center", "offset_x": 0, "offset_y": 40,
+                "message": "Cover 8-bit de SUNNY SUMMER", "size": 12, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "line_6", "position": "center", "offset_x": 0, "offset_y": 80,
+                "message": "Este juego fue el primer proyecto de programación que realizamos", "size": 12, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "line_7", "position": "center", "offset_x": 0, "offset_y": 100,
+                "message": "Le pusimos mucho cariño y esfuerzo, por lo tanto, ¡esperamos que lo disfruten!", "size": 12, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "line_8", "position": "center", "offset_x": 0, "offset_y": 135,
+                "message": "¡¡¡GRACIAS POR JUGAR :D!!!", "size": 30, "color": "yellow", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "line_ult", "position": "bottom_center", "offset_x": 0, "offset_y": -5,
+                "message": "[presiona cualquier tecla para volver al menú]", "size": 10, "color": (180, 180, 180), "font": "main_font", "antialias": True
+            }
+
+        ]
+}

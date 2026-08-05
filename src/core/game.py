@@ -29,7 +29,6 @@ class Game:
         load_from_file()
 
         # Instanciamos sistemas, gestor de caché y el gestor de recursos
-        self.physics = Physics()
         self.renderer = Renderer(self.screen)
         self.cache = CacheManager()
 
@@ -43,7 +42,12 @@ class Game:
         self.Ball = Ball
         self.Table = Table
         self.Net = Net
-
+        #Tambien guardamos las referencias a los modulos estaticos de fisicas y reglas de juego
+        #Tambien referencia al modulo de la CPU
+        self.Physics = Physics
+        self.GameRules = GameRules
+        self.CPUBrain = CPUBrain
+        
         # Instanciamos el gestor de estados e iniciamos el menú
         self.state_manager = StateManager(states_factory=self.states_factory)
 

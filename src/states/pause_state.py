@@ -28,10 +28,6 @@ class PauseState(BaseState):
         self.sliders["volume_sfx"].value = settings.data.get("volume_sfx", 0.7)
         self.sliders["wheel_sensitivity"].value = settings.data.get("wheel_sensitivity", 15)  
 
-        #
-        self.audio.play_music("PAUSE", "dopodime")
-        #
-
     def exit(self):
         pass
 
@@ -43,9 +39,11 @@ class PauseState(BaseState):
                    
             elif self.buttons["menu"].handle_input(event):
                 self.next_change_state = "MENU"
+                self.audio.stop_music()
 
             elif self.buttons["restart"].handle_input(event):
                 self.next_change_state = "PLAY"
+                self.audio.stop_music()
             
             elif self.sliders["volume_music"].handle_input(event):
                 #modificamos el volumen de la musica, guardamos en memoria y llamamos al gestor de audio

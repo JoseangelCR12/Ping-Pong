@@ -13,7 +13,7 @@ class CPUBrain:
         
         # Comportamiento de repliegue defensivo cuando la pelota se aleja hacia el jugador
         if ball.vy <= 0:
-            target_x = config.DEFAULT_CPU_CENTER_X
+            target_x = 0
             target_y = config.DEFAULT_CPU_CENTER_Y  
             target_z = config.DEFAULT_CPU_CENTER_Z
             CPUBrain._smooth_move(cpu_paddle, target_x, target_y, target_z, dt)
@@ -34,7 +34,7 @@ class CPUBrain:
         time_to_bounce = 0.0
 
         # Buscamos el momento exacto en el que la pelota golpea la mesa
-        while sim_vy > 0 and sim_y < config.CPU_MAX_Y and sim_z > min_table_z:
+        while sim_vy > 0 and sim_y < config.OPPONENT_SIDE_Y and sim_z > min_table_z:
             sim_vx *= config.FRICTION
             sim_vy *= config.FRICTION
             sim_vz -= gravity_step
@@ -82,7 +82,7 @@ class CPUBrain:
 
         # Ajuste de las posiciones ideales dentro de los límites de movimiento de la CPU
         target_x = max(min_table_x - 10, min(target_x, max_table_x + 10))
-        target_y = max(config.CPU_MIN_Y, min(target_y, config.CPU_MAX_Y))
+        target_y = max(config.NET_Y, min(target_y, config.OPPONENT_SIDE_Y))
         target_z = max(min_table_z + 10, min(target_z, config.MAX_PADDLE_Z)) # Asegurar altura de golpeo cómoda
 
         # pasamos el mov publico al paddle
