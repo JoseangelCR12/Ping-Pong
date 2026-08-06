@@ -18,6 +18,7 @@ class Ball:
         #las dimensiones de la pelota (la hitbox será un cubo)
         self.radius = config.BALL_RADIUS
 
+
     def get_limits(self):
 
         """Retorna los limites de la pelota en el frame actual (min_x, max_x, min_y, max_y, min_z, max_z)"""

@@ -1,6 +1,7 @@
 GLOBAL = {
     "sprites": {
-        "logo": "assets/ui/{theme}/icons/logo.png"
+        "logo": "assets/ui/{theme}/icons/logo.png",
+        "small_underlay": "assets/ui/{theme}/icons/small_underlay.png",
     },
     "music": {
     },

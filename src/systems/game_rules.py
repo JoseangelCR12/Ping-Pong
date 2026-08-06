@@ -22,6 +22,12 @@ class GameRules:
         self.match_over = False
         self.winner = None
 
+        self.new_rally_delay = 3.0
+        self.rally_over = False
+
+        #La cpu tiene un delay antes de sacar
+        self.cpu_toss_delay = 2.0
+
     def toss_ball(self):
         """Metodo que se llama cuando se realiza un saque"""
         if self.waiting_for_serve and not self.is_tossed:
@@ -82,7 +88,7 @@ class GameRules:
                         return self._award_point("CPU" if self.current_server == "PLAYER" else "PLAYER")
             
             #Juego normal
-            if self.last_hit_by == "PLAYER":
+            elif self.last_hit_by == "PLAYER":
                 if not is_opponent_side:
                     return self._award_point("CPU") #El jugador le pega y pica de su mismo lado
                 if self.cpu_side_bounced:   
@@ -119,7 +125,12 @@ class GameRules:
         Metodo interno para actualizar el marcador y el estado del set cuando un jugador gana un punto.
         Rota el servidor si es necesario y determina si el set ha terminado.
         """
+        #Si se acaba de dar un punto y no ha empezado otro rally, detenemos los nuevos puntos
+        if self.rally_over:
+            return "CONTINUE"
         
+        self.rally_over = True
+
         if winner_of_point == "PLAYER":
             self.player_score += 1
         elif winner_of_point == "CPU":
@@ -140,21 +151,33 @@ class GameRules:
             if self.total_services_done % 2 == 0:
                 self.current_server = "CPU" if self.current_server == "PLAYER" else "PLAYER"
         
-        self.reset_rally_state()
         return "POINT"
     
     def register_paddle_hit(self, hitter):
         """
         Registra el impacto de una raqueta
-        si la misma raqueta le vuelve a dar consecutivamente, pierde el punto
         """
-        if self.last_hit_by == hitter:
-            #Doble toque
-            return self._award_point("CPU" if hitter == "PLAYER" else "PLAYER")
+        #Verficamos que no se golpee la pelota antes de que rebote durante el rally activo
+        if not self.is_service and self.last_hit_by != hitter:
+            if hitter == "PLAYER" and not self.player_side_bounced:
+                return self._award_point("CPU")
+            elif hitter == "CPU" and not self.cpu_side_bounced:
+                return self._award_point("PLAYER")
+
 
         #Actualizamos el ultimo golper
         self.last_hit_by = hitter
         return "CONTINUE"
+    
+    def start_next_rally(self, dt):
+        """Espera para iniciar el rally"""
+        if self.new_rally_delay > 0.0:
+            self.new_rally_delay -= dt
+
+            if self.new_rally_delay <= 0.0:
+                self.new_rally_delay = 3.0
+                self.reset_rally_state()
+
 
     def reset_rally_state(self):
         """Limpia las banderas de rebotes para la siguiente jugada"""
@@ -164,3 +187,7 @@ class GameRules:
         self.player_side_bounced = False
         self.cpu_side_bounced = False
         self.touched_net = False
+        self.rally_over = False
+
+        self.waiting_for_serve = True
+        self.is_tossed = False

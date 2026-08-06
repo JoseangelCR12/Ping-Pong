@@ -182,6 +182,49 @@ SELECTION = {
         ]
 }
 
+GAMEOVER = { 
+        
+        "icons": [
+            {
+                "name": "underlay", "position": "center", "offset_x": 0, "offset_y": 0,
+                "texture": "small_underlay"
+            }
+        ],
+
+        "texts": [
+            {
+                "name": "0", "position": "center", "offset_x": 0, "offset_y": -20,
+                "message": "¡¡HAS PERDIDO!!", "size": 24, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "1", "position": "center", "offset_x": 0, "offset_y": 20,
+                "message": "QUÉ MALO ERES...", "size": 24, "color": "white", "font": "main_font", "antialias": True
+            }
+        ]
+}
+
+WIN = { 
+        
+        "icons": [
+            {
+                "name": "underlay", "position": "center", "offset_x": 0, "offset_y": 0,
+                "texture": "small_underlay"
+            }
+        ],
+
+        "texts": [
+            {
+                "name": "0", "position": "center", "offset_x": 0, "offset_y": -20,
+                "message": "¡¡HAS GANADO!!", "size": 24, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "1", "position": "center", "offset_x": 0, "offset_y": 20,
+                "message": "¡¡OYE ERES BUENÍSIMO!!", "size": 24, "color": "white", "font": "main_font", "antialias": True
+            }
+        ]
+}
+
+
 CREDITS = { 
         
         "icons": [

@@ -123,11 +123,7 @@ class PlayState(BaseState):
             if self.Physics.check_paddle_collision(self.ball, self.player_paddle, dt): #verificamos colision con la raqueta del jugador
                 self.audio.play_sound(self.state_name, "paddle_hit")
                 self.game_rules.register_paddle_hit("PLAYER")
-            
-           
-            if self.Physics.check_paddle_collision(self.ball, self.cpu_paddle, dt): #verificamos colision con la raqueta de la cpu
-                self.audio.play_sound(self.state_name, "paddle_hit")
-                self.game_rules.register_paddle_hit("CPU")
+
             
                 #Verficamos colisiones con otros elementos
             hit_table = self.Physics.check_surface_collision(self.ball, self.table.get_limits())
@@ -138,15 +134,17 @@ class PlayState(BaseState):
             result = self.game_rules.evaluate_frame(hit_table, hit_floor, hit_net, self.ball.y)
         
             ##TEMPORAL
-            if result == "POINT":
-                print("POINT")
-                print(f"service:_{self.game_rules.is_service}_golpe_ultimo:_{self.game_rules.last_hit_by}_server:_{self.game_rules.current_server}")
+            if result == "POINT" or self.game_rules.rally_over:
+                self.game_rules.start_next_rally(dt)
             if result == "LET":
-                print("LET \n\n\n\n")
+                self.game_rules.start_next_rally(dt)
             if result == "MATCH_OVER":
-                print("MATCH OVER")
+                if self.game_rules.winner == "PLAYER":
+                    self.next_push_state = "WIN"
+                else: 
+                    self.next_push_state = "GAMEOVER"
 
-        elif self.game_rules.current_server == "PLAYER":
+        elif self.game_rules.current_server == "PLAYER": #Si le toca sacar al jugador
             #El jugador no puede pasar de la mitad antes de sacar
             self.mouse_y = max(self.mouse_y, config.WINDOW_HEIGHT // 2)
             #La pelota se mantiene delante de la raqueta
@@ -155,11 +153,28 @@ class PlayState(BaseState):
             self.ball.z = self.player_paddle.z
             self.ball.vx, self.ball.vy, self.ball.vz = 0, 0, 0
 
+        elif self.game_rules.current_server == "CPU": #si le toca sacar al cpu
+            #La pelota se queda con la cpu y luego de un momento esta empieza el rally
+            self.ball.x = self.cpu_paddle.x
+            self.ball.y = self.cpu_paddle.y - 30
+            self.ball.z = self.cpu_paddle.z
+
+            #va pasando el tiempo para que saque
+            self.game_rules.cpu_toss_delay -= dt
+
+            if self.game_rules.cpu_toss_delay <= 0.0:
+                if self.game_rules.toss_ball():
+                    self.game_rules.cpu_toss_delay = 2.0
+                    #La pelota se lanza al lado contrario picando una vez del lado de la cpu
+                    self.ball.vx, self.ball.vy, self.ball.vz = 0, -300, -150
+
         #Enviamos la informacion del mouse a la raqueta, la cual aplica el clamp y guarda la posicion tridimensional al traducir coordenadas del mouse
         self.player_paddle.mouse_to_world(self.mouse_x, self.mouse_y, self.target_z_change, dt)
 
-        ###
-        self.CPUBrain.calculate_and_move(self.cpu_paddle, self.ball, self.table.get_limits(), dt)
+        ###El modulo de la cpu registra cuando le pega
+        if self.CPUBrain.calculate_and_move(self.cpu_paddle, self.ball, self.table.get_limits(), dt):
+            self.audio.play_sound(self.state_name, "paddle_hit")
+            self.game_rules.register_paddle_hit("CPU")
         ###
 
 
@@ -233,11 +248,15 @@ class PlayState(BaseState):
         #Ahora elementos de UI
         for text in self.texts.values():
             text.draw(screen)
+        #El color de las letras pequeñas varia en funcion del mapa en el que estemos
+        text_color = "white"
+        if data["theme"] == "purple": 
+            text_color = (160, 0, 170)
 
         #Mostramos el puntaje
         font = self.resource_manager.get_font(self.state_name, "main_font", 24)
-        player_score = font.render(f"{self.game_rules.player_score}", True, "white")
-        cpu_score = font.render(f"{self.game_rules.cpu_score}", True, "white")
+        player_score = font.render(f"{self.game_rules.player_score}", True, text_color)
+        cpu_score = font.render(f"{self.game_rules.cpu_score}", True, text_color)
         self.renderer.render_sprite(player_score, (config.WINDOW_WIDTH // 2) + 290, (config.WINDOW_HEIGHT // 2) - 30)
         self.renderer.render_sprite(cpu_score, (config.WINDOW_WIDTH // 2) - 280, (config.WINDOW_HEIGHT // 2) - 30)
 
@@ -246,13 +265,23 @@ class PlayState(BaseState):
         screen_tuple2 = (config.WINDOW_WIDTH // 2, config.WINDOW_HEIGHT // 2 + 40)
         if self.start_delay > 0:
             countdown_text = f"¡¡Preparado!! {int(self.start_delay) + 1}"
-            if self.game_rules.current_server == "Player":
+
+            server_text = None
+            if self.game_rules.current_server == "PLAYER":
                 server_text = "¡Tú estás al saque!"
-            else:
+            elif self.game_rules.current_server == "CPU":
                 server_text = "¡CPU al saque!"
 
-            font = self.resource_manager.get_font(self.state_name, "main_font", 60)
-            text1_surface = font.render(countdown_text, True, (255, 255, 255))
+            font = self.resource_manager.get_font(self.state_name, "main_font", 45)
+            text1_surface = font.render(countdown_text, True, text_color)
             self.renderer.render_sprite(text1_surface, *screen_tuple1)
-            text2_surface = font.render(server_text, True, (255, 255, 255))
-            self.renderer.render_sprite(text2_surface, *screen_tuple2)
+            if server_text is not None:
+                text2_surface = font.render(server_text, True, text_color)
+                self.renderer.render_sprite(text2_surface, *screen_tuple2)
+
+        #instruccion a la hora de sacar
+        if self.game_rules.current_server == "PLAYER" and self.game_rules.is_service:
+            font = self.resource_manager.get_font(self.state_name, "main_font", 16)
+            guide_text = font.render("Dale a 'Espacio' para elevar la pelota para sacar", True, text_color)
+            self.renderer.render_sprite(guide_text, config.WINDOW_WIDTH // 2, config.WINDOW_HEIGHT - 40)
+

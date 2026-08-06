@@ -13,7 +13,7 @@ class CPUBrain:
         - Mantiene la raqueta en posición de espera hasta que la pelota pica.
         - Solo tras el rebote inicia el swing y devuelve con fuerza controlada.
         """
-        min_table_x, max_table_x, min_table_y, max_table_y, min_table_z, _ = table_limits
+        min_table_x, max_table_x, min_table_y, max_table_y, min_table_z, max_table_z = table_limits
 
         # --- 1. RESET DE ESTADO (Cuando la pelota vuelve al campo del jugador) ---
         if ball.y <= config.NET_Y or ball.vy < -20.0:
@@ -26,17 +26,16 @@ class CPUBrain:
             target_y = config.DEFAULT_CPU_CENTER_Y
             target_z = config.DEFAULT_CPU_CENTER_Z
             CPUBrain._smooth_move(cpu_paddle, target_x, target_y, target_z, dt, force_speed=config.CPU_MOVE_SPEED)
-            return
+            return False
 
         paddle_depth = getattr(cpu_paddle, 'depth', 6.0)
         ball_radius = getattr(ball, 'radius', 5.0)
 
         # --- 3. DETECCIÓN REAL DEL REBOTE EN EL LADO DE LA CPU ---
         # Si la pelota está en el lado de la CPU (y > NET_Y) y...
-        # A) Su velocidad vertical es positiva (está rebotando hacia arriba después del impacto)
-        # B) O la pelota está rozando la altura de la mesa (z <= min_table_z + ball_radius + 3.0)
+        # Si la pelota está rozando la altura de la mesa (z <= min_table_z + ball_radius + 3.0)
         if ball.y > config.NET_Y:
-            if ball.vz > 5.0 or ball.z <= (min_table_z + ball_radius + 3.0):
+            if ball.z <= (max_table_z + ball_radius + 3.0):
                 CPUBrain.has_bounced = True
 
         dist_x = abs(cpu_paddle.x - ball.x)
@@ -65,7 +64,7 @@ class CPUBrain:
 
             # Desacoplamiento físico
             ball.y = cpu_paddle.y - (paddle_depth + ball_radius + 6.0)
-            return
+            return True
 
         # --- 5. COMPORTAMIENTO DE ESPERA VS EMBESTIDA ---
         target_x = ball.x
@@ -89,6 +88,8 @@ class CPUBrain:
         target_z = max(min_table_z + ball_radius + 6.0, min(target_z, config.MAX_PADDLE_Z))
 
         CPUBrain._smooth_move(cpu_paddle, target_x, target_y, target_z, dt, force_speed=EMBESTIDA_SPEED)
+
+        return False
 
     @staticmethod
     def _smooth_move(paddle, target_x, target_y, target_z, dt, force_speed):

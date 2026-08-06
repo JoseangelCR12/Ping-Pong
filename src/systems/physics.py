@@ -103,7 +103,7 @@ class Physics:
         #Si la distancia real entre la pelota y la raqueta es muy grande, volvemos
         if math.dist((ball.x, ball.y, ball.z), (paddle.x, paddle.y, paddle.z)) > 25:
             return False
-
+        
 
         #Donde estaba la raqueta en el frame anterior
         prev_min_x = cur_min_x - paddle.vx
@@ -125,23 +125,28 @@ class Physics:
         if (swept_min_x <= ball.x <= swept_max_x and
             swept_min_y <= ball.y <= swept_max_y and
             swept_min_z <= ball.z <= swept_max_z):
-                
-                current_restitution, other_restitution = paddle.get_restitution()
-                z_factor = 0.2 #factor para que la velocidad de la raqueta al subir o bajar no rompa el juego
-                speed_factor = 0.5
-
-                if ball.y < paddle.y:
-                    ball.y = cur_min_y - ball.radius
-                    ball.vy += paddle.vy * other_restitution * speed_factor
-                    ball.vx += paddle.vx * other_restitution * speed_factor
-                    ball.vz += paddle.vz * other_restitution * z_factor
-
-                elif ball.y > paddle.y:
-                    ball.y = cur_max_y + ball.radius
-                    ball.vy += paddle.vy * current_restitution * speed_factor
-                    ball.vx += paddle.vx * current_restitution * speed_factor
-                    ball.vz += paddle.vz * current_restitution * z_factor
-
-                return True
             
+
+            current_restitution, other_restitution = paddle.get_restitution()
+            z_factor = 0.2 #factor para que la velocidad de la raqueta al subir o bajar no rompa el juego
+            speed_factor = 0.5
+
+            if ball.y < paddle.y and paddle.vy < 0:
+                ball.y = cur_min_y - ball.radius
+                ball.vy = -abs(ball.vy)
+                ball.vy += paddle.vy * other_restitution * speed_factor
+                ball.vx += paddle.vx * other_restitution * speed_factor
+                ball.vz += paddle.vz * other_restitution * z_factor
+                            
+            elif ball.y > paddle.y and paddle.vy > 0:
+                ball.y = cur_max_y + ball.radius
+                ball.vy = abs(ball.vy)
+                ball.vy += paddle.vy * current_restitution * speed_factor
+                ball.vx += paddle.vx * current_restitution * speed_factor
+                ball.vz += paddle.vz * current_restitution * z_factor
+            
+            return True
+
+
         return False
+    
