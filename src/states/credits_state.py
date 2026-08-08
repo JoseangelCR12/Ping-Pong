@@ -25,10 +25,6 @@ class CreditsState(BaseState):
         self.icons = self.ui_elements["icons"]
         self.texts = self.ui_elements["texts"]
 
-    def exit(self):
-        #Detenemos la musica
-        self.audio.stop_music()
-
     def handle_input(self, events : list[py.event.Event]) -> None:
         for event in events:
             if event.type == py.KEYDOWN:

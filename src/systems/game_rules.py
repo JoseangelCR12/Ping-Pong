@@ -5,7 +5,7 @@ class GameRules:
     def __init__(self, initial_server="PLAYER"):
         self.current_server = initial_server
         self.is_service = True
-        self.last_hit_by = initial_server
+        self.last_hit_by = "NONE" #temporal, hasta que alguien pegue
         self.total_services_done = 0
         self.waiting_for_serve = True
         self.is_tossed = False
@@ -25,8 +25,8 @@ class GameRules:
         self.new_rally_delay = 3.0
         self.rally_over = False
 
-        #La cpu tiene un delay antes de sacar
-        self.cpu_toss_delay = 2.0
+        #tiempo desde golpe para cantar falta por doble toque
+        self.fault_delay = 1.0
 
     def toss_ball(self):
         """Metodo que se llama cuando se realiza un saque"""
@@ -41,6 +41,7 @@ class GameRules:
         Analiza los eventos fisicos del frame actual a traves de booleanos.
         retorna 'CONTINUE', 'POINT' o 'LET' segun corresponda.
         """
+
 
         if self.match_over:
             return "MATCH_OVER"
@@ -65,6 +66,7 @@ class GameRules:
                         if not is_server_side:
                             return self._award_point("CPU" if self.current_server == "PLAYER" else "PLAYER") 
                         self.server_side_bounced = True
+                        
                         return "CONTINUE"
                     
                     #Segundo rebote obligatorio en la lado del receptor
@@ -75,18 +77,24 @@ class GameRules:
                             return "LET"
 
                         self.is_service = False #Saque valido, inicia el juego normal
+                        self.server_side_bounced = False
 
                         #Registramos en que lugar se dio el rebote que inicia la partida
                         if is_opponent_side:
                             self.cpu_side_bounced = True
+                            self.player_side_bounced = False
                         else:
                             self.player_side_bounced = True
+                            self.cpu_side_bounced = False
                         return "CONTINUE"
 
                     else:
                         #Segundo rebote en el lado del servidor, punto para el receptor
                         return self._award_point("CPU" if self.current_server == "PLAYER" else "PLAYER")
-            
+                
+                elif self.last_hit_by == "NONE": #Toca la mesa y no le da primero el que saca 
+                    return self._award_point("CPU" if self.current_server == "PLAYER" else "PLAYER") 
+
             #Juego normal
             elif self.last_hit_by == "PLAYER":
                 if not is_opponent_side:
@@ -94,6 +102,7 @@ class GameRules:
                 if self.cpu_side_bounced:   
                     return self._award_point("PLAYER") #El jugador le pega y pica en el lado del receptor dos veces
                 self.cpu_side_bounced = True
+                self.player_side_bounced = False
                 self.touched_net = False
 
             elif self.last_hit_by == "CPU":
@@ -102,10 +111,11 @@ class GameRules:
                 if self.player_side_bounced:   
                     return self._award_point("CPU") #La cpu le pega y pica en el lado del receptor dos veces
                 self.player_side_bounced = True
+                self.cpu_side_bounced = False
                 self.touched_net = False
 
             return "CONTINUE"
-        
+
         #Si pega en el suelo (pelota fuera)
         if hit_floor:
             #Si toco la red justo antes de caer al suelo, es punto para el receptor
@@ -128,7 +138,7 @@ class GameRules:
         #Si se acaba de dar un punto y no ha empezado otro rally, detenemos los nuevos puntos
         if self.rally_over:
             return "CONTINUE"
-        
+
         self.rally_over = True
 
         if winner_of_point == "PLAYER":
@@ -164,16 +174,22 @@ class GameRules:
             elif hitter == "CPU" and not self.cpu_side_bounced:
                 return self._award_point("PLAYER")
 
+        #Si se le da en el saque a la pelota despues de que ya picó una vez en su propio lado
+        if self.server_side_bounced and self.last_hit_by == hitter and self.fault_delay <= 0.0:
+            if hitter == "PLAYER":
+                return self._award_point("CPU")
+            elif hitter == "CPU":
+                return self._award_point("PLAYER")
 
-        #Actualizamos el ultimo golper
+        #Actualizamos el ultimo golpe
         self.last_hit_by = hitter
         return "CONTINUE"
     
     def start_next_rally(self, dt):
-        """Espera para iniciar el rally"""
+        """Espera para iniciar el rally"""                       
         if self.new_rally_delay > 0.0:
             self.new_rally_delay -= dt
-
+            
             if self.new_rally_delay <= 0.0:
                 self.new_rally_delay = 3.0
                 self.reset_rally_state()
@@ -182,7 +198,7 @@ class GameRules:
     def reset_rally_state(self):
         """Limpia las banderas de rebotes para la siguiente jugada"""
         self.is_service = True
-        self.last_hit_by = self.current_server
+        self.last_hit_by = "NONE"  #temporal, hasta que alguien pegue
         self.server_side_bounced = False
         self.player_side_bounced = False
         self.cpu_side_bounced = False
@@ -191,3 +207,5 @@ class GameRules:
 
         self.waiting_for_serve = True
         self.is_tossed = False
+
+        self.fault_delay = 1.0

@@ -71,6 +71,10 @@ class PlayState(BaseState):
         #Cargamos la ui y guardamos los subdiccionarios de elementos
         self.ui_elements = load_ui(self.state_name, self.resource_manager, self.audio)
         self.texts = self.ui_elements["texts"]
+
+        #Reproducimos la musica
+        self.audio.stop_music()
+        self.audio.play_music(self.state_name, "in-game_music")
                                       
     def handle_input(self, events : list[py.event.Event]) -> None:
         #reinicio de la acumulacion de la ruedita del mouse
@@ -115,36 +119,61 @@ class PlayState(BaseState):
             #Detenemos el update
             return
         
+        #Actualizamos a la cpu y comprobamos si ha pegado
+        cpu_has_hit = self.CPUBrain.calculate_and_move(self.cpu_paddle, self.ball, self.table.get_limits(), dt)
         #Logica pre-saque
         if not self.game_rules.waiting_for_serve:
             #Actualizamos las fisicas
             self.Physics.move_ball(self.ball, dt) #actualizamos la pelota
 
-            if self.Physics.check_paddle_collision(self.ball, self.player_paddle, dt): #verificamos colision con la raqueta del jugador
-                self.audio.play_sound(self.state_name, "paddle_hit")
-                self.game_rules.register_paddle_hit("PLAYER")
+            hit_paddle =  self.Physics.check_paddle_collision(self.ball, self.player_paddle, dt) #verificamos colision con la raqueta del jugador
 
-            
                 #Verficamos colisiones con otros elementos
             hit_table = self.Physics.check_surface_collision(self.ball, self.table.get_limits())
+            if hit_table:
+                self.audio.play_sound(self.state_name, "bounce_sound_1")
             hit_floor = self.Physics.check_floor_collision(self.ball)
+            if hit_floor:
+                self.audio.play_sound(self.state_name, "bounce_sound_2")
             hit_net = self.Physics.check_net_collision(self.ball, self.net.get_limits())
+            if hit_net:
+                self.audio.play_sound(self.state_name, "hit_net")
 
             #Ahora verificamos el partido con el modulo de reglas (arbitro)
             result = self.game_rules.evaluate_frame(hit_table, hit_floor, hit_net, self.ball.y)
+            
+            #Si hubo un golpe del jugador, se empieza a contar el tiempo para tener un treshold para el doble toque en el saque
+            if self.game_rules.fault_delay < 1.0:
+                self.game_rules.fault_delay -= dt
+                
+            if hit_paddle:
+                if self.game_rules.last_hit_by != "PLAYER":    
+                    self.audio.play_sound(self.state_name, "hit_sound")
+                    self.game_rules.fault_delay -= dt
+                self.game_rules.register_paddle_hit("PLAYER")
         
-            ##TEMPORAL
+            ###El modulo de la cpu registra cuando le pega
+            if cpu_has_hit:
+                self.audio.play_sound(self.state_name, "hit_sound")
+                self.game_rules.register_paddle_hit("CPU")
+            ###
+            
+            ##Verificamos el resultado
             if result == "POINT" or self.game_rules.rally_over:
+                if self.game_rules.new_rally_delay == 3.0:
+                    self.audio.play_sound(self.state_name, "beep")
                 self.game_rules.start_next_rally(dt)
+
             if result == "LET":
                 self.game_rules.start_next_rally(dt)
+                
             if result == "MATCH_OVER":
                 if self.game_rules.winner == "PLAYER":
                     self.next_push_state = "WIN"
                 else: 
                     self.next_push_state = "GAMEOVER"
 
-        elif self.game_rules.current_server == "PLAYER": #Si le toca sacar al jugador
+        elif self.game_rules.current_server == "PLAYER" and self.game_rules.is_tossed is False: #Si le toca sacar al jugador
             #El jugador no puede pasar de la mitad antes de sacar
             self.mouse_y = max(self.mouse_y, config.WINDOW_HEIGHT // 2)
             #La pelota se mantiene delante de la raqueta
@@ -154,28 +183,13 @@ class PlayState(BaseState):
             self.ball.vx, self.ball.vy, self.ball.vz = 0, 0, 0
 
         elif self.game_rules.current_server == "CPU": #si le toca sacar al cpu
-            #La pelota se queda con la cpu y luego de un momento esta empieza el rally
-            self.ball.x = self.cpu_paddle.x
-            self.ball.y = self.cpu_paddle.y - 30
-            self.ball.z = self.cpu_paddle.z
-
-            #va pasando el tiempo para que saque
-            self.game_rules.cpu_toss_delay -= dt
-
-            if self.game_rules.cpu_toss_delay <= 0.0:
-                if self.game_rules.toss_ball():
-                    self.game_rules.cpu_toss_delay = 2.0
-                    #La pelota se lanza al lado contrario picando una vez del lado de la cpu
-                    self.ball.vx, self.ball.vy, self.ball.vz = 0, -300, -150
+            if self.CPUBrain.serve(self.cpu_paddle, self.ball, self.game_rules.toss_ball, dt):
+                self.audio.play_sound(self.state_name, "hit_sound")
+                self.game_rules.register_paddle_hit("CPU") #le decimos a las reglas que hubo contacto
 
         #Enviamos la informacion del mouse a la raqueta, la cual aplica el clamp y guarda la posicion tridimensional al traducir coordenadas del mouse
         self.player_paddle.mouse_to_world(self.mouse_x, self.mouse_y, self.target_z_change, dt)
 
-        ###El modulo de la cpu registra cuando le pega
-        if self.CPUBrain.calculate_and_move(self.cpu_paddle, self.ball, self.table.get_limits(), dt):
-            self.audio.play_sound(self.state_name, "paddle_hit")
-            self.game_rules.register_paddle_hit("CPU")
-        ###
 
 
     def render(self, screen: py.Surface) -> None:
@@ -250,13 +264,15 @@ class PlayState(BaseState):
             text.draw(screen)
         #El color de las letras pequeñas varia en funcion del mapa en el que estemos
         text_color = "white"
+        text_color_1 = text_color
         if data["theme"] == "purple": 
-            text_color = (160, 0, 170)
+            text_color = "yellow"
+            text_color_1 = (100, 100, 120)
 
         #Mostramos el puntaje
         font = self.resource_manager.get_font(self.state_name, "main_font", 24)
-        player_score = font.render(f"{self.game_rules.player_score}", True, text_color)
-        cpu_score = font.render(f"{self.game_rules.cpu_score}", True, text_color)
+        player_score = font.render(f"{self.game_rules.player_score}", True, text_color_1)
+        cpu_score = font.render(f"{self.game_rules.cpu_score}", True, text_color_1)
         self.renderer.render_sprite(player_score, (config.WINDOW_WIDTH // 2) + 290, (config.WINDOW_HEIGHT // 2) - 30)
         self.renderer.render_sprite(cpu_score, (config.WINDOW_WIDTH // 2) - 280, (config.WINDOW_HEIGHT // 2) - 30)
 
@@ -283,5 +299,4 @@ class PlayState(BaseState):
         if self.game_rules.current_server == "PLAYER" and self.game_rules.is_service:
             font = self.resource_manager.get_font(self.state_name, "main_font", 16)
             guide_text = font.render("Dale a 'Espacio' para elevar la pelota para sacar", True, text_color)
-            self.renderer.render_sprite(guide_text, config.WINDOW_WIDTH // 2, config.WINDOW_HEIGHT - 40)
-
+            self.renderer.render_sprite(guide_text, config.WINDOW_WIDTH // 2, config.WINDOW_HEIGHT - 24)

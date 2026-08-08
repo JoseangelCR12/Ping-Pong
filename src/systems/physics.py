@@ -101,7 +101,7 @@ class Physics:
         cur_min_x, cur_max_x, cur_min_y, cur_max_y, cur_min_z, cur_max_z = paddle.get_limits()
         
         #Si la distancia real entre la pelota y la raqueta es muy grande, volvemos
-        if math.dist((ball.x, ball.y, ball.z), (paddle.x, paddle.y, paddle.z)) > 25:
+        if math.dist((ball.x, ball.y, ball.z), (paddle.x, paddle.y, paddle.z)) > 35:
             return False
         
 
@@ -131,19 +131,20 @@ class Physics:
             z_factor = 0.2 #factor para que la velocidad de la raqueta al subir o bajar no rompa el juego
             speed_factor = 0.5
 
-            if ball.y < paddle.y and paddle.vy < 0:
+            if paddle.vy >= 0:
+                ball.y = cur_max_y + ball.radius
+                ball.vy = abs(ball.vy)
+                ball.vy += paddle.vy * current_restitution * speed_factor
+                ball.vx += paddle.vx * current_restitution * speed_factor
+                ball.vz += paddle.vz * current_restitution * z_factor
+
+            elif ball.y < paddle.y and paddle.vy < 0 and ball.vy <= 0:
                 ball.y = cur_min_y - ball.radius
                 ball.vy = -abs(ball.vy)
                 ball.vy += paddle.vy * other_restitution * speed_factor
                 ball.vx += paddle.vx * other_restitution * speed_factor
                 ball.vz += paddle.vz * other_restitution * z_factor
                             
-            elif ball.y > paddle.y and paddle.vy > 0:
-                ball.y = cur_max_y + ball.radius
-                ball.vy = abs(ball.vy)
-                ball.vy += paddle.vy * current_restitution * speed_factor
-                ball.vx += paddle.vx * current_restitution * speed_factor
-                ball.vz += paddle.vz * current_restitution * z_factor
             
             return True
 

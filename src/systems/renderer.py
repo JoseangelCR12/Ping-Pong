@@ -10,6 +10,7 @@ class Renderer:
         texture_h = texture.get_height()
         
         if scale is not None:
+            scale = min(100, max(0.1, scale))
             texture_w = int(texture_w * scale)
             texture_h = int(texture_h * scale)
             texture = py.transform.scale(texture, (texture_w, texture_h))

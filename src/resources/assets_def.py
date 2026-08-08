@@ -4,13 +4,16 @@ GLOBAL = {
         "small_underlay": "assets/ui/{theme}/icons/small_underlay.png",
     },
     "music": {
+        "menu_music": "assets/audio/menu_music.ogg"
     },
     "font": {
         "main_font": "assets/font/Retro Gaming.ttf"
     },
     "sound": {
         "click_sound": "assets/audio/click_button.ogg",
-        "slider_sound": "assets/audio/slider_click.ogg"
+        "slider_sound": "assets/audio/slider_click.ogg",
+        "win_sound": "assets/audio/win_sound.ogg",
+        "lose_sound": "assets/audio/lose_sound.ogg"
     }
     }
 
@@ -40,8 +43,16 @@ PLAY = {
     "spritesheets": {
         "paddle": "assets/entities/{theme}/paddle.png"        
     }, 
-    "sound": {},
-    "music": {}
+    "sound": {
+        "bounce_sound_1": "assets/audio/bounce_sound_1.ogg",
+        "bounce_sound_2": "assets/audio/bounce_sound_2.ogg",
+        "hit_sound": "assets/audio/hit_sound.ogg",
+        "beep": "assets/audio/beep.ogg",
+        "hit_net": "assets/audio/hit_net.ogg"
+    },
+    "music": {
+        "in-game_music": "assets/audio/in-game_music.ogg"
+    }
     }
 
 OPTIONS = {

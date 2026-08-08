@@ -12,6 +12,7 @@ class MenuState(BaseState):
         super().__init__(resource_manager)
         self.audio = audio
 
+        self.state_name = "MENU"
     def resume(self):
         #Recargamos la ui al venir del menu de opciones
         self.enter()
@@ -21,9 +22,10 @@ class MenuState(BaseState):
         py.mouse.set_visible(True) # Mouse visible
 
         #Cargamos la ui y guardamos los subdiccionarios de elementos
-        self.ui_elements = load_ui("MENU", self.resource_manager, self.audio)
+        self.ui_elements = load_ui(self.state_name, self.resource_manager, self.audio)
         self.buttons = self.ui_elements["buttons"]
         self.icons = self.ui_elements["icons"]
+        self.audio.play_music(self.state_name, "menu_music")
 
     def handle_input(self, events : list[py.event.Event]) -> None:
         for event in events:

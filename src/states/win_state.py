@@ -25,7 +25,7 @@ class WinState(BaseState):
 
         self.audio.stop_music()
         self.audio.play_music(self.state_name, "menu_music")
-        self.audio.play_sound(self.state_name, "win")
+        self.audio.play_sound(self.state_name, "win_sound")
 
     def exit(self):
         self.audio.stop_music()

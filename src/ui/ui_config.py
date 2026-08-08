@@ -248,12 +248,20 @@ CREDITS = {
                 "message": "Arte original creado en LibreSprite", "size": 12, "color": "white", "font": "main_font", "antialias": True
             },
             {
-                "name": "line_4", "position": "center", "offset_x": 0, "offset_y": 20,
-                "message": "Música de Darnu-Pop", "size": 12, "color": "white", "font": "main_font", "antialias": True
+                "name": "line_4", "position": "center", "offset_x": -140, "offset_y": 20,
+                "message": "Música 8-bit del menú:", "size": 12, "color": "white", "font": "main_font", "antialias": True
             },
             {
-                "name": "line_5", "position": "center", "offset_x": 0, "offset_y": 40,
-                "message": "Cover 8-bit de SUNNY SUMMER", "size": 12, "color": "white", "font": "main_font", "antialias": True
+                "name": "line_5", "position": "center", "offset_x": -140, "offset_y": 40,
+                "message": "Hola, Soy Yo! de Pixverses", "size": 12, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "line_4_1", "position": "center", "offset_x": 140, "offset_y": 20,
+                "message": "Música 8-bit in-game:", "size": 12, "color": "white", "font": "main_font", "antialias": True
+            },
+            {
+                "name": "line_5_1", "position": "center", "offset_x": 140, "offset_y": 40,
+                "message": "Boss Time de FesliyanStudios", "size": 12, "color": "white", "font": "main_font", "antialias": True
             },
             {
                 "name": "line_6", "position": "center", "offset_x": 0, "offset_y": 80,
