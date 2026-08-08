@@ -1,6 +1,7 @@
 {
     "title": "PING-PONG ARCADE",
-    "description": "Juego de ping-pong pseudo3D",
+    "description": "Juego de Ping-Pong Pseudo3D",
     "authors": ["Joseangel Cardenas", "Diego Velasquez"],
-    "group_number": 8
+    "group_number": 8,
+    "controls": "¡Te mueves con el mouse! \nUsa la ruedita para subir y bajar"
 }

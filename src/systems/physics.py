@@ -128,7 +128,7 @@ class Physics:
             
 
             current_restitution, other_restitution = paddle.get_restitution()
-            z_factor = 0.2 #factor para que la velocidad de la raqueta al subir o bajar no rompa el juego
+            z_factor = 0.4 #factor para que la velocidad de la raqueta al subir o bajar no rompa el juego
             speed_factor = 0.5
 
             if paddle.vy >= 0:

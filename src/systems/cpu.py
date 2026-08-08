@@ -111,18 +111,25 @@ class CPUBrain:
             CPUBrain.has_hit_ball = True
             if data["cpu_level"] == 3:
                 # Potencia calibrada 
-                RETURN_POWER = max(480.0, abs(ball.vy) * 5)
+                RETURN_POWER = max(480.0, min(600, abs(ball.vy) * 5))
                 ball.vy = -RETURN_POWER
 
                 # Dirección horizontal
                 ball.vx = (-ball.x * 0.5 - ball.x) * 1.1
 
                 # Parábola de retorno
-                if ball.z > (max_table_z + 50.0):
-                    ball.vz = -40.0   # Remate suave si subió un poco
-                    ball.vy *= 1.6
+                if ball.z > (max_table_z + 65.0):
+                    if ball.y > config.OPPONENT_SIDE_Y - 60:
+                        ball.vz = -110.0   # Remate mas largo si subió un poco y esta por el borde
+                        ball.vy *= 1.5
+                    else:
+                        ball.vz = -100.0   # Remate si subió un poco
+                        ball.vy *= 1.3
+                elif ball.z > (max_table_z + 40.0):
+                    ball.vz = -90.0   # Remate si subió un poco
+                    ball.vy *= 1.4
                 else:
-                    ball.vz = 85.0    # Arco para pasar la red
+                    ball.vz = 80.0    # Arco para pasar la red
 
                 # Desacoplamiento físico
                 ball.y = cpu_paddle.y - (paddle_depth + ball_radius + 6.0)
@@ -130,7 +137,7 @@ class CPUBrain:
             
             elif data["cpu_level"] == 2:
                 # Potencia calibrada 
-                RETURN_POWER = max(330.0, abs(ball.vy) * 4)
+                RETURN_POWER = max(370.0, min(500, abs(ball.vy) * 4))
                 ball.vy = -RETURN_POWER
 
                 # Dirección horizontal
@@ -138,10 +145,15 @@ class CPUBrain:
 
                 # Parábola de retorno
                 if ball.z > (max_table_z + 50.0):
-                    ball.vz = -30.0   # Remate suave si subió un tanto
-                    ball.vx *= 1.4
+                    if ball.y > config.OPPONENT_SIDE_Y - 50:
+                        ball.vz = -20.0   # Remate mas largo si subió un poco y esta por el borde
+                        ball.vy *= 1.5
+                    else:
+                        ball.vz = -20.0   # Remate suave si subió un tanto
+                        ball.vx *= 1.4
+                    
                 else:
-                    ball.vz = 110.0    # Arco para pasar la red
+                    ball.vz = 90.0    # Arco para pasar la red
 
                 # Desacoplamiento físico
                 ball.y = cpu_paddle.y - (paddle_depth + ball_radius + 6.0)
@@ -156,8 +168,11 @@ class CPUBrain:
                 ball.vx = (-ball.x * 0.3 - ball.x) * 0.6
 
                 # Parábola de retorno
-                ball.vz = 125.0    # Arco para pasar la red
-                print(f"{ball.vy}")
+                if ball.z < (max_table_z + 30.0):
+                    ball.vz = 80
+                else:
+                    ball.vz = 125.0    # Arco para pasar la red
+               
                 # Desacoplamiento físico
                 ball.y = cpu_paddle.y - (paddle_depth + ball_radius + 6.0)
                 return True
@@ -169,7 +184,7 @@ class CPUBrain:
         if CPUBrain.has_bounced:
             # ¡Ya picó! La raqueta embiste hacia adelante para pegarle
             target_y = ball.y - 20.0
-            EMBESTIDA_SPEED = max(CPUBrain.cpu_move_speed * 5.0, abs(ball.vy) * 3.0)
+            EMBESTIDA_SPEED = max(CPUBrain.cpu_move_speed * 4.0, abs(ball.vy) * 2.5)
             if data["cpu_level"] == 2:
                 EMBESTIDA_SPEED = max(CPUBrain.cpu_move_speed * 2.5, abs(ball.vy) * 1.2)
             elif data["cpu_level"] == 1:
@@ -224,16 +239,16 @@ class CPUBrain:
                     if choice == 0:
                         ball.vx, ball.vy, ball.vz = 0, -300, -150
                     elif choice == 1:
-                        ball.vx, ball.vy, ball.vz = -20, -450, -100
+                        ball.vx, ball.vy, ball.vz = -20, -450, -140
                     elif choice == 2:
-                        ball.vx, ball.vy, ball.vz = 70, -300, -120
+                        ball.vx, ball.vy, ball.vz = 70, -300, -140
                 elif data["cpu_level"] == 2:
                     if choice == 1:
-                        ball.vx, ball.vy, ball.vz = 0, -170, -300
+                        ball.vx, ball.vy, ball.vz = 0, -230, -300
                     else:
-                        ball.vx, ball.vy, ball.vz = 0, -240, -200
+                        ball.vx, ball.vy, ball.vz = -35, -240, -200
                 elif data["cpu_level"] == 1:
-                    ball.vx, ball.vy, ball.vz = 0, -200, -250
+                    ball.vx, ball.vy, ball.vz = 0, -240, -250
                                 
                 return True
 
