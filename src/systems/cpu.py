@@ -81,7 +81,7 @@ class CPUBrain:
             CPUBrain.prediction_done = True
 
         # Si no se detecta un rebote válido en la mesa, la pelota va fuera y nos apartamos
-        if not CPUBrain.rebounded_on_table and CPUBrain.prediction_done:
+        if not CPUBrain.rebounded_on_table and CPUBrain.prediction_done and ball.vy != 0:
             target_x = max_table_x + 30 if ball.x < (min_table_x + max_table_x)/2 else min_table_x - 30
             target_y = config.DEFAULT_CPU_CENTER_Y
             target_z = config.DEFAULT_CPU_CENTER_Z
@@ -120,17 +120,24 @@ class CPUBrain:
                 # Parábola de retorno
                 if ball.z > (max_table_z + 65.0):
                     if ball.y > config.OPPONENT_SIDE_Y - 60:
-                        ball.vz = -110.0   # Remate mas largo si subió un poco y esta por el borde
+                        ball.vz = -90.0   # Remate mas largo si subió un poco y esta por el borde
                         ball.vy *= 1.5
+                    elif ball.y < config.NET_Y + 60:
+                        ball.vz = -120.0   # Remate duro si esta cerca de la malla
+                        ball.vy *= 1.3
                     else:
-                        ball.vz = -100.0   # Remate si subió un poco
+                        ball.vz = -80.0   # Remate si subió un poco
                         ball.vy *= 1.3
                 elif ball.z > (max_table_z + 40.0):
-                    ball.vz = -90.0   # Remate si subió un poco
-                    ball.vy *= 1.4
+                    if ball.y > config.OPPONENT_SIDE_Y - 60:
+                        ball.vz = -10.0   # Remate mas largo si subió un poco y esta por el borde
+                        ball.vy *= 1.5
+                    else:
+                        ball.vz = -20.0   # Remate si subió un poco
+                        ball.vy *= 1.4
                 else:
-                    ball.vz = 80.0    # Arco para pasar la red
-
+                    ball.vz = 10.0    # Arco para pasar la red
+                    
                 # Desacoplamiento físico
                 ball.y = cpu_paddle.y - (paddle_depth + ball_radius + 6.0)
                 return True
@@ -144,17 +151,26 @@ class CPUBrain:
                 ball.vx = (-ball.x * 0.4 - ball.x) * 0.8
 
                 # Parábola de retorno
-                if ball.z > (max_table_z + 50.0):
-                    if ball.y > config.OPPONENT_SIDE_Y - 50:
-                        ball.vz = -20.0   # Remate mas largo si subió un poco y esta por el borde
+                if ball.z > (max_table_z + 65.0):
+                    if ball.y > config.OPPONENT_SIDE_Y - 60:
+                        ball.vz = -10.0   # Remate mas largo si subió un poco y esta por el borde
                         ball.vy *= 1.5
+                    elif ball.y < config.NET_Y + 60:
+                        ball.vz = -90.0   # Remate duro si esta cerca de la malla
+                        ball.vy *= 1.2
                     else:
-                        ball.vz = -20.0   # Remate suave si subió un tanto
-                        ball.vx *= 1.4
-                    
+                        ball.vz = -20.0   # Remate si subió un poco
+                        ball.vy *= 1.5
+                elif ball.z > (max_table_z + 40.0):
+                    if ball.y > config.OPPONENT_SIDE_Y - 60:
+                        ball.vz = 30.0   # golpe mas largo si subió un poco
+                        ball.vy *= 1.3
+                    else:
+                        ball.vz = 20.0   # golpe si subió un poco
+                        ball.vy *= 1.3    
                 else:
-                    ball.vz = 90.0    # Arco para pasar la red
-
+                    ball.vz = 100.0    # Arco para pasar la red
+                    
                 # Desacoplamiento físico
                 ball.y = cpu_paddle.y - (paddle_depth + ball_radius + 6.0)
                 return True
