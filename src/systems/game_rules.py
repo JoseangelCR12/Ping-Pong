@@ -127,6 +127,8 @@ class GameRules:
                 return self._award_point("PLAYER" if self.cpu_side_bounced else "CPU")
             elif self.last_hit_by == "CPU":
                 return self._award_point("CPU" if self.player_side_bounced else "PLAYER")
+            elif self.last_hit_by == "NONE":
+                return self._award_point("CPU" if self.current_server == "PLAYER" else "PLAYER")
 
         return "CONTINUE"
 

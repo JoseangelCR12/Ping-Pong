@@ -138,7 +138,7 @@ class Physics:
                 ball.vx += paddle.vx * current_restitution * speed_factor
                 ball.vz += paddle.vz * current_restitution * z_factor
 
-            elif ball.y < paddle.y and paddle.vy < 0 and ball.vy <= 0:
+            elif paddle.vy < 0 and ball.vy <= 0:
                 ball.y = cur_min_y - ball.radius
                 ball.vy = -abs(ball.vy)
                 ball.vy += paddle.vy * other_restitution * speed_factor
