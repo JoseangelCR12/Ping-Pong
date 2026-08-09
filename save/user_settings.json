@@ -4,7 +4,7 @@
     "wheel_sensitivity": 20,
     "theme": "classic",
     "camera_mode": "standard",
-    "cpu_level": 2,
+    "cpu_level": 3,
     "horizon_line": -15,
     "camera_depth": -180,
     "camera_height": 304,

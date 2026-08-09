@@ -118,25 +118,32 @@ class CPUBrain:
                 ball.vx = (-ball.x * 0.5 - ball.x) * 1.1
 
                 # Parábola de retorno
-                if ball.z > (max_table_z + 65.0):
-                    if ball.y > config.OPPONENT_SIDE_Y - 60:
-                        ball.vz = -90.0   # Remate mas largo si subió un poco y esta por el borde
+                if ball.z > (max_table_z + 70.0):
+                    if ball.y > config.OPPONENT_SIDE_Y - 50:
+                        ball.vz = -50.0   # Remate mas largo si subió un poco y esta por el borde
                         ball.vy *= 1.5
-                    elif ball.y < config.NET_Y + 60:
+                    elif ball.y <= config.NET_Y + 60:
                         ball.vz = -120.0   # Remate duro si esta cerca de la malla
                         ball.vy *= 1.3
                     else:
-                        ball.vz = -80.0   # Remate si subió un poco
+                        ball.vz = -60.0   # Remate si subió un poco
                         ball.vy *= 1.3
                 elif ball.z > (max_table_z + 40.0):
                     if ball.y > config.OPPONENT_SIDE_Y - 60:
-                        ball.vz = -10.0   # Remate mas largo si subió un poco y esta por el borde
+                        ball.vz = 30.0   # Remate mas largo si subió un poco y esta por el borde
                         ball.vy *= 1.5
+                    elif ball.y <= config.NET_Y + 60:
+                        ball.vz = -110.0   # Remate duro si esta cerca de la malla
+                        ball.vy *= 1.2
                     else:
-                        ball.vz = -20.0   # Remate si subió un poco
+                        ball.vz = 20.0   # Remate si subió un poco
                         ball.vy *= 1.4
                 else:
-                    ball.vz = 10.0    # Arco para pasar la red
+                    if ball.y <= config.NET_Y + 40:
+                        ball.vz = -90.0   # Remate duro si esta cerca de la malla
+                        ball.vy *= 1.2
+                    else:
+                        ball.vz = 90.0    # Arco para pasar la red
                     
                 # Desacoplamiento físico
                 ball.y = cpu_paddle.y - (paddle_depth + ball_radius + 6.0)
