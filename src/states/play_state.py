@@ -89,16 +89,6 @@ class PlayState(BaseState):
                 if event.key == py.K_SPACE:
                     if self.game_rules.current_server == "PLAYER" and self.game_rules.toss_ball():
                         self.ball.vz = 200 #Le damos un impulso hacia arriba a la pelota
-
-                ## PARA TESTEO, RESPAWNEA PELOTA
-                if event.key == py.K_g:
-                    self.ball.update_pos(0, config.PLAYER_SIDE_Y + 20, config.Z_TABLE + 50)
-                    self.ball.vx = 0.0
-                    self.ball.vy = 0.0
-                    self.ball.vz = 0.0
-                    self.game_rules.reset_rally_state()
-
-                ##
             
             elif event.type == py.MOUSEBUTTONDOWN:
                 if event.button == py.BUTTON_WHEELUP: wheel_z_change = data.get("wheel_sensitivity", 15)
